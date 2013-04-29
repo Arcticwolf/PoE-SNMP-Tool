@@ -23,7 +23,7 @@
   ~ Boston, MA  02110-1301  USA
   -->
 <persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
-  <persistence-unit name="entityManager">
+  <persistence-unit name="poe-snmp-tool">
     <class>cn.poe.group1.entity.Measurement</class>
     <class>cn.poe.group1.entity.Switch</class>
     <properties>
@@ -31,7 +31,7 @@
       <property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1;MVCC=TRUE"/>
       <property name="javax.persistence.jdbc.user" value="sa"/>
       <property name="javax.persistence.jdbc.password" value=""/>
-      <property name="hibernate.show_sql" value="true"/>
+      <property name="hibernate.show_sql" value="false"/>
       <property name="hibernate.hbm2ddl.auto" value="create"/>
     </properties>
   </persistence-unit>

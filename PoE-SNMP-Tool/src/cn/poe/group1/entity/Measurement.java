@@ -1,5 +1,6 @@
 package cn.poe.group1.entity;
 
+import com.google.common.base.Objects;
 import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -21,6 +22,17 @@ public class Measurement {
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date measureTime;
     private String measuredValue;
+    
+    public Measurement() {
+        // needs to be here because of hibernate
+    }
+    
+    public Measurement(Switch sw, String oid, Date measureTime, String measuredValue) {
+        this.sw = sw;
+        this.oid = oid;
+        this.measureTime = measureTime;
+        this.measuredValue = measuredValue;
+    }
 
     public String getOid() {
         return oid;
@@ -62,4 +74,10 @@ public class Measurement {
         this.id = id;
     }
 
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(Measurement.class).add("id", id)
+                .add("switch", sw).add("oid", oid).add("measureTime", measureTime)
+                .add("measuredValue", measuredValue).omitNullValues().toString();
+    }
 }

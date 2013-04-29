@@ -23,14 +23,14 @@ public class Main {
     public Main(Configuration config) {
         log.info("measurement interval : {}", config.getMeasurementInterval());
         
-        Switch sw = new Switch();
-        sw.setIdentifier("testid");
-        sw.setType("testtype");
+        entityManagerFactory = Persistence.createEntityManagerFactory("poe-snmp-tool");
         
-        entityManagerFactory = Persistence.createEntityManagerFactory("entityManager");
+        Switch sw = new Switch("testid", "testIp", "testtype", 20);   
+        Switch sw2 = new Switch("testid2", "testIp2", "testtype2", 30);
         EntityManager entityManager = entityManagerFactory.createEntityManager();
 	entityManager.getTransaction().begin();
         entityManager.persist(sw);
+        entityManager.persist(sw2);
         entityManager.getTransaction().commit();
 	entityManager.close();
         
@@ -38,7 +38,7 @@ public class Main {
 		entityManager.getTransaction().begin();
         List<Switch> result = entityManager.createQuery( "from Switch", Switch.class ).getResultList();
 	for ( Switch res : result ) {
-		System.out.println( "Switch (" + res.getIdentifier() + ") : " + res.getType());
+		System.out.println(res.toString());
 	}
         entityManager.getTransaction().commit();
         entityManager.close();

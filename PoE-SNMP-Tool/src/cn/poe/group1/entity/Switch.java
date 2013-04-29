@@ -1,5 +1,6 @@
 package cn.poe.group1.entity;
 
+import com.google.common.base.Objects;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -15,6 +16,17 @@ public class Switch {
     private String ipAddress;
     private String type;
     private int portCount;
+    
+    public Switch() {
+        // needs to be here because of hibernate
+    }
+    
+    public Switch(String identifier, String ipAddress, String type, int portCount) {
+        this.identifier = identifier;
+        this.ipAddress = ipAddress;
+        this.type = type;
+        this.portCount = portCount;
+    }
 
     @Id
     public String getIdentifier() {
@@ -47,5 +59,12 @@ public class Switch {
 
     public void setPortCount(int portCount) {
         this.portCount = portCount;
+    }
+    
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(Switch.class).add("identifier", identifier)
+                .add("ipAddress", ipAddress).add("type", type)
+                .add("portCount", portCount).omitNullValues().toString();
     }
 }
