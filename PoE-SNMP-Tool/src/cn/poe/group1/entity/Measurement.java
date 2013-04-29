@@ -1,23 +1,26 @@
 package cn.poe.group1.entity;
 
 import java.util.Date;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
 
 /**
  * This is the model of a measurement retrieved from a SNMP switch.
  */
+@Entity
+@Table( name = "MEASUREMENT" )
 public class Measurement {
+    @Id
+    private Long id;
+    @ManyToOne
     private Switch sw;
     private String oid;
-    private Date timestamp;
-    private String value;
-
-    public Switch getSwitch() {
-        return sw;
-    }
-
-    public void setSwitch(Switch sw) {
-        this.sw = sw;
-    }
+    @Temporal(javax.persistence.TemporalType.DATE)
+    private Date measureTime;
+    private String measuredValue;
 
     public String getOid() {
         return oid;
@@ -27,19 +30,36 @@ public class Measurement {
         this.oid = oid;
     }
 
-    public Date getTimestamp() {
-        return timestamp;
+    public Switch getSwitch() {
+        return sw;
     }
 
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
+    public void setSwitch(Switch sw) {
+        this.sw = sw;
     }
 
-    public String getValue() {
-        return value;
+    public Date getMeasureTime() {
+        return measureTime;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setMeasureTime(Date measureTime) {
+        this.measureTime = measureTime;
     }
+
+    public String getMeasuredValue() {
+        return measuredValue;
+    }
+
+    public void setMeasuredValue(String measuredValue) {
+        this.measuredValue = measuredValue;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
 }
