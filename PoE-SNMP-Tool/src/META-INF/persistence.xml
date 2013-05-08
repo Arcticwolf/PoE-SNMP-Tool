@@ -33,6 +33,7 @@
       <property name="javax.persistence.jdbc.password" value=""/>
       <property name="hibernate.show_sql" value="false"/>
       <property name="hibernate.hbm2ddl.auto" value="create"/>
+      <property name="hibernate.dialect" value="cn.poe.group1.db.ImprovedH2Dialect"/>
     </properties>
   </persistence-unit>
 </persistence>
