@@ -1,7 +1,7 @@
 package cn.poe.group1.entity;
 
 import com.google.common.base.Objects;
-import javax.persistence.Column;
+import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -12,7 +12,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table( name = "SWITCH" )
-public class Switch {
+public class Switch implements Serializable {
     @Id
     private String identifier;
     private String ipAddress;

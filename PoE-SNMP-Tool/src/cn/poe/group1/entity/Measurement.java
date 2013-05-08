@@ -1,8 +1,10 @@
 package cn.poe.group1.entity;
 
 import com.google.common.base.Objects;
+import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -16,12 +18,12 @@ import javax.persistence.Temporal;
  */
 @Entity
 @Table( name = "MEASUREMENT" )
-public class Measurement {
+public class Measurement implements Serializable {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO, generator="sequence_generator")
     @SequenceGenerator(name="sequence_generator", sequenceName="SEQUENCER")
     private Long id;
-    @ManyToOne
+    @ManyToOne (fetch = FetchType.LAZY)
     private Switch sw;
     private String oid;
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
