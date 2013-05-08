@@ -9,12 +9,10 @@ import cn.poe.group1.entity.Measurement;
 public interface SNMPDataRetriever {
     
     /**
-     * Connects to a power-over-ethernet switch and retrieves a measurement from
-     * the given oid.
-     * @param switchIp The ip where the switch is located
-     * @param oid The oid of the value that shall be retrieved
+     * Returns a measurment from a power-over-ethernet switch. The data what
+     * actually be measured need to be defined in the implementing class.
      * @return A measurement object with the measured value
      */
-    Measurement takeMeasurement(String switchIp, String oid);
+    Measurement takeMeasurement();
     
 }
