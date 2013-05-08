@@ -15,11 +15,12 @@ import org.junit.Test;
  * This is a JUnit test class for the measurement database implementation.
  */
 public class MeasurementBackendTest {
+    private static final String FACTORY_NAME = "poe-snmp-tool-test";
     private static MeasurementBackend backend;
     
     @BeforeClass
     public static void init() {
-        backend = new MeasurementDatabase("poe-snmp-tool-test");
+        backend = new MeasurementDatabase(FACTORY_NAME);
     }
 
     @Test
