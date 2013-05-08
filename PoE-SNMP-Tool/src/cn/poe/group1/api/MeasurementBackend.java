@@ -31,22 +31,50 @@ public interface MeasurementBackend {
             Date startTime, Date endTime);
     
     /**
-     * Saves a switch object to the measurement backend.
-     * @param sw The switch object that shall be persisted.
+     * Query for all measurements for the given oid on the Switch with the 
+     * given switch id.
+     * @param switchId The id of the switch for which the measurement is taken
+     * @param oidThe SNMP oid of the measurement interested in
+     * @return The list of measurements which are match the query elements
      */
-    void saveSwitch(Switch sw);
+    List<Measurement> queryMeasurements(String switchId, String oid);
     
     /**
-     * Updates a switch object in the measurement backend.
-     * @param sw The switch object that shall be updated.
+     * Query for all measurements for the Switch with the  given switch id.
+     * @param switchId The id of the switch for which the measurement is taken
+     * @return The list of measurements which are match the query elements
      */
-    void updateSwitch(Switch sw);
+    List<Measurement> queryMeasurements(String switchId);
+    
+    /**
+     * Query for measurements which are persisted in the save backend.
+     * @param switchId The id of the switch for which the measurement is taken
+     * @param startTime The beginning time which decides which measurements are
+     * considered in the query
+     * @param endTime The end time which decides to which time the measurements
+     * are considered in the query
+     * @return The list of measurements which are match the query elements
+     */
+    List<Measurement> queryMeasurements(String switchId, Date startTime, Date endTime);
+    
+    /**
+     * Saves or updates a switch object to the measurement backend.
+     * @param sw The switch object that shall be persisted.
+     */
+    void persistSwitch(Switch sw);
 
     /**
      * Deletes a switch object from the measurement backend.
      * @param sw The switch object that shall be deleted.
      */
     void deleteSwitch(Switch sw);
+    
+    /**
+     * Loads a switch object based on its id.
+     * @param id The id of the switch that shall be loaded.
+     * @return The loaded switch object or null if there is no such switch.
+     */
+    Switch getSwitchById(String id);
     
     /**
      * Returns a list of all switch objects which are currently persisted.
