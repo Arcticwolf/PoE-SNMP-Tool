@@ -1,41 +1,20 @@
 package cn.poe.group1.collector;
 
-import cn.poe.group1.api.Configuration;
-import cn.poe.group1.api.MeasurementBackend;
 import cn.poe.group1.api.SNMPDataRetriever;
-import cn.poe.group1.entity.Switch;
-import java.util.Timer;
-import java.util.TimerTask;
+import cn.poe.group1.entity.Measurement;
+import cn.poe.group1.entity.Port;
 
 /**
- * The DataCollector collects in a perios defined in the configuration file data
- * about a combination of a switch and an oid.
+ * The PortDataCollector can collect a measurement from a given port object.
  */
-public class DataCollector {
-    private Configuration configuration;
-    private MeasurementBackend backend;
-    private Timer timer;
+public class PortDataCollector {
+    private SNMPDataRetriever retriever;
     
-    public DataCollector(Configuration configuration, MeasurementBackend backend) {
-        this.configuration = configuration;
-        this.backend = backend;
-        timer = new Timer();
+    public PortDataCollector(Port port) {
+        this.retriever = new DummyDataRetriever(port);
     }
     
-    public void startCollecting(Switch sw, String oid) {
-        final SNMPDataRetriever retriever = new DummyDataRetriever(sw, oid);
-        timer.scheduleAtFixedRate(new TimerTask() {
-
-            @Override
-            public void run() {
-                backend.saveMeasurement(retriever.takeMeasurement());
-            }
-            
-        }, 0, configuration.getMeasurementInterval());
-    }
-    
-    public void stopCollecting() {
-        timer.cancel();
-    }
-    
+    public Measurement takeMeasurement() {
+        return retriever.takeMeasurement();
+    }   
 }

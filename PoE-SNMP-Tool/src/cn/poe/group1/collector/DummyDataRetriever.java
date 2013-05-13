@@ -2,7 +2,8 @@ package cn.poe.group1.collector;
 
 import cn.poe.group1.api.SNMPDataRetriever;
 import cn.poe.group1.entity.Measurement;
-import cn.poe.group1.entity.Switch;
+import cn.poe.group1.entity.Port;
+import cn.poe.group1.entity.PortStatus;
 import java.util.Date;
 
 /**
@@ -10,21 +11,24 @@ import java.util.Date;
  * for mocking the real behaviour.
  */
 public class DummyDataRetriever implements SNMPDataRetriever {
-    private Switch sw;
-    private String oid;
+    private Port port;
     
-    public DummyDataRetriever(Switch sw, String oid) {
-        this.sw = sw;
-        this.oid = oid;
+    public DummyDataRetriever(Port port) {
+        this.port = port;
     }
 
     @Override
     public Measurement takeMeasurement() {
         Measurement measurement = new Measurement();
-        measurement.setSwitch(sw);
-        measurement.setOid(oid);
+        measurement.setPort(port);
+        measurement.setCpeExtPsePortDeviceDetected(true);
+        measurement.setCpeExtPsePortEnable(PortStatus.AUTO);
+        measurement.setCpeExtPsePortMaxPwrDrawn(1150);
+        measurement.setCpeExtPsePortPwrAllocated(1200);
+        measurement.setCpeExtPsePortPwrAvailable(1300);
+        measurement.setCpeExtPsePortPwrMax(1150);
+        measurement.setCpeExtPsePortPwrConsumption((int) (Math.random() * 1200));
         measurement.setMeasureTime(new Date());
-        measurement.setMeasuredValue((int) (Math.random() * 80) + "");
         return measurement;
     }
 
