@@ -2,7 +2,7 @@ package cn.poe.group1;
 
 import cn.poe.group1.api.Configuration;
 import cn.poe.group1.api.MeasurementBackend;
-import cn.poe.group1.collector.DataCollector;
+import cn.poe.group1.collector.SwitchDataCollector;
 import cn.poe.group1.db.MeasurementDatabase;
 import cn.poe.group1.entity.Switch;
 import java.io.IOException;
@@ -26,15 +26,16 @@ public class Main {
         
         measurementBackend = new MeasurementDatabase(FACTORY_NAME);
         
-        Switch sw = new Switch("testid", "testIp", "testtype", 20);
+        Switch sw = new Switch("testid", "testIp", "testtype", 2, "testswitch");
         measurementBackend.persistSwitch(sw);
         
-        DataCollector collector = new DataCollector(config, measurementBackend);
-        collector.startCollecting(sw, "testoid");
+        SwitchDataCollector collector = new SwitchDataCollector(sw, config, measurementBackend);
+        collector.initPortBase();
+        collector.startCollecting();
         log.info("Start collecting measurements. Press Enter to quit.");
         System.in.read();
         collector.stopCollecting();
         log.info("Quit taking measurements. Measurement count: {}", 
-                measurementBackend.queryMeasurements(sw.getIdentifier()).size());
+                measurementBackend.queryMeasurementsBySwitch(sw).size());
     }
 }
