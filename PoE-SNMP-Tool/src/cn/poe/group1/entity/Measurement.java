@@ -130,6 +130,13 @@ public class Measurement implements Serializable {
     public String toString() {
         return Objects.toStringHelper(Measurement.class).add("id", id)
                 .add("port", port).add("measureTime", measureTime)
+                .add("cpeExtPsePortEnable", cpeExtPsePortEnable)
+                .add("cpeExtPsePortDeviceDetected", cpeExtPsePortDeviceDetected)
+                .add("cpeExtPsePortPwrMax", cpeExtPsePortPwrMax)
+                .add("cpeExtPsePortPwrAllocated", cpeExtPsePortPwrAllocated)
+                .add("cpeExtPsePortPwrAvailable", cpeExtPsePortPwrAvailable)
+                .add("cpeExtPsePortPwrConsumption", cpeExtPsePortPwrConsumption)
+                .add("cpeExtPsePortMaxPwrDrawn", cpeExtPsePortMaxPwrDrawn)
                 .toString();
     }
 }
