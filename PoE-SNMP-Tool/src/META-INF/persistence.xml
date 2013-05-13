@@ -26,6 +26,7 @@
   <persistence-unit name="poe-snmp-tool">
     <class>cn.poe.group1.entity.Measurement</class>
     <class>cn.poe.group1.entity.Switch</class>
+    <class>cn.poe.group1.entity.Port</class>
     <properties>
       <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
       <property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1;MVCC=TRUE"/>

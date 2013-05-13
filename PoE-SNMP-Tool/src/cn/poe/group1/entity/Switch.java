@@ -18,16 +18,19 @@ public class Switch implements Serializable {
     private String ipAddress;
     private String type;
     private int portCount;
+    private String comment;
     
     public Switch() {
         // needs to be here because of hibernate
     }
     
-    public Switch(String identifier, String ipAddress, String type, int portCount) {
+    public Switch(String identifier, String ipAddress, String type, int portCount,
+            String comment) {
         this.identifier = identifier;
         this.ipAddress = ipAddress;
         this.type = type;
         this.portCount = portCount;
+        this.comment = comment;
     }
 
     public String getIdentifier() {
@@ -66,6 +69,7 @@ public class Switch implements Serializable {
     public String toString() {
         return Objects.toStringHelper(Switch.class).add("identifier", identifier)
                 .add("ipAddress", ipAddress).add("type", type)
-                .add("portCount", portCount).omitNullValues().toString();
+                .add("portCount", portCount).add("comment", comment)
+                .omitNullValues().toString();
     }
 }

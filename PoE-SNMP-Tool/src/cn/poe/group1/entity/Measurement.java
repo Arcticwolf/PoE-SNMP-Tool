@@ -24,37 +24,34 @@ public class Measurement implements Serializable {
     @SequenceGenerator(name="sequence_generator", sequenceName="SEQUENCER")
     private Long id;
     @ManyToOne (fetch = FetchType.LAZY)
-    private Switch sw;
-    private String oid;
+    private Port port;
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date measureTime;
-    private String measuredValue;
+    
+    private PortStatus cpeExtPsePortEnable;
+    private Boolean cpeExtPsePortDeviceDetected;
+    private Integer cpeExtPsePortPwrMax; // milliwatts
+    private Integer cpeExtPsePortPwrAllocated; // milliwatts
+    private Integer cpeExtPsePortPwrAvailable; // milliwatts
+    private Integer cpeExtPsePortPwrConsumption; // milliwatts
+    private Integer cpeExtPsePortMaxPwrDrawn; // milliwatts
+    
     
     public Measurement() {
         // needs to be here because of hibernate
     }
     
-    public Measurement(Switch sw, String oid, Date measureTime, String measuredValue) {
-        this.sw = sw;
-        this.oid = oid;
+    public Measurement(Port port, Date measureTime) {
+        this.port = port;
         this.measureTime = measureTime;
-        this.measuredValue = measuredValue;
     }
 
-    public String getOid() {
-        return oid;
+    public Port getPort() {
+        return port;
     }
 
-    public void setOid(String oid) {
-        this.oid = oid;
-    }
-
-    public Switch getSwitch() {
-        return sw;
-    }
-
-    public void setSwitch(Switch sw) {
-        this.sw = sw;
+    public void setPort(Port port) {
+        this.port = port;
     }
 
     public Date getMeasureTime() {
@@ -65,14 +62,6 @@ public class Measurement implements Serializable {
         this.measureTime = measureTime;
     }
 
-    public String getMeasuredValue() {
-        return measuredValue;
-    }
-
-    public void setMeasuredValue(String measuredValue) {
-        this.measuredValue = measuredValue;
-    }
-
     public Long getId() {
         return id;
     }
@@ -81,10 +70,66 @@ public class Measurement implements Serializable {
         this.id = id;
     }
 
+    public PortStatus getCpeExtPsePortEnable() {
+        return cpeExtPsePortEnable;
+    }
+
+    public void setCpeExtPsePortEnable(PortStatus cpeExtPsePortEnable) {
+        this.cpeExtPsePortEnable = cpeExtPsePortEnable;
+    }
+
+    public Boolean getCpeExtPsePortDeviceDetected() {
+        return cpeExtPsePortDeviceDetected;
+    }
+
+    public void setCpeExtPsePortDeviceDetected(Boolean cpeExtPsePortDeviceDetected) {
+        this.cpeExtPsePortDeviceDetected = cpeExtPsePortDeviceDetected;
+    }
+
+    public Integer getCpeExtPsePortPwrMax() {
+        return cpeExtPsePortPwrMax;
+    }
+
+    public void setCpeExtPsePortPwrMax(Integer cpeExtPsePortPwrMax) {
+        this.cpeExtPsePortPwrMax = cpeExtPsePortPwrMax;
+    }
+
+    public Integer getCpeExtPsePortPwrAllocated() {
+        return cpeExtPsePortPwrAllocated;
+    }
+
+    public void setCpeExtPsePortPwrAllocated(Integer cpeExtPsePortPwrAllocated) {
+        this.cpeExtPsePortPwrAllocated = cpeExtPsePortPwrAllocated;
+    }
+
+    public Integer getCpeExtPsePortPwrAvailable() {
+        return cpeExtPsePortPwrAvailable;
+    }
+
+    public void setCpeExtPsePortPwrAvailable(Integer cpeExtPsePortPwrAvailable) {
+        this.cpeExtPsePortPwrAvailable = cpeExtPsePortPwrAvailable;
+    }
+
+    public Integer getCpeExtPsePortPwrConsumption() {
+        return cpeExtPsePortPwrConsumption;
+    }
+
+    public void setCpeExtPsePortPwrConsumption(Integer cpeExtPsePortPwrConsumption) {
+        this.cpeExtPsePortPwrConsumption = cpeExtPsePortPwrConsumption;
+    }
+
+    public Integer getCpeExtPsePortMaxPwrDrawn() {
+        return cpeExtPsePortMaxPwrDrawn;
+    }
+
+    public void setCpeExtPsePortMaxPwrDrawn(Integer cpeExtPsePortMaxPwrDrawn) {
+        this.cpeExtPsePortMaxPwrDrawn = cpeExtPsePortMaxPwrDrawn;
+    }
+    
     @Override
     public String toString() {
         return Objects.toStringHelper(Measurement.class).add("id", id)
-                .add("switch", sw).add("oid", oid).add("measureTime", measureTime)
-                .add("measuredValue", measuredValue).omitNullValues().toString();
+                .add("port", port).add("measureTime", measureTime)
+                .toString();
     }
 }
