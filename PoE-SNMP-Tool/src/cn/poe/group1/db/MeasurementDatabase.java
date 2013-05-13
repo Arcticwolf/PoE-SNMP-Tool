@@ -2,6 +2,7 @@ package cn.poe.group1.db;
 
 import cn.poe.group1.api.MeasurementBackend;
 import cn.poe.group1.entity.Measurement;
+import cn.poe.group1.entity.Port;
 import cn.poe.group1.entity.Switch;
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,48 +38,6 @@ public class MeasurementDatabase implements MeasurementBackend {
     }
 
     @Override
-    public List<Measurement> queryMeasurements(String switchId, String oid, 
-            Date startTime, Date endTime) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Measurement> query = builder.createQuery(Measurement.class);
-        Root from = query.from(Measurement.class);
-        query.select(from);
-        
-        List<Predicate> predicates = new ArrayList<>();
-        
-        Path<String> path = from.get("sw").get("identifier");
-        predicates.add(builder.equal(path, switchId));
-        if (oid != null) {
-            predicates.add(builder.equal(from.get("oid"), oid));
-        }
-        if (startTime != null && endTime != null) {
-            predicates.add(builder.between(from.get("measureTime"), 
-                startTime, endTime));
-        }
-        
-        query.where(builder.and(predicates.toArray(new Predicate[predicates.size()])));
-        query.orderBy(builder.asc(from.get("measureTime")));
-        
-        TypedQuery<Measurement> typedQuery = entityManager.createQuery(query);
-        return typedQuery.getResultList();
-    }
-    
-    @Override
-    public List<Measurement> queryMeasurements(String switchId, Date startTime, Date endTime) {
-        return queryMeasurements(switchId, null, startTime, endTime);
-    }
-    
-    @Override
-    public List<Measurement> queryMeasurements(String switchId, String oid) {
-        return queryMeasurements(switchId, oid, null, null);
-    }
-
-    @Override
-    public List<Measurement> queryMeasurements(String switchId) {
-        return queryMeasurements(switchId, null, null, null);
-    }    
-
-    @Override
     public void persistSwitch(Switch sw) {
         entityManager.getTransaction().begin();
         entityManager.persist(sw);
@@ -101,5 +60,90 @@ public class MeasurementDatabase implements MeasurementBackend {
     @Override
     public Switch getSwitchById(String id) {
         return entityManager.find(Switch.class, id);
+    }
+    
+    @Override
+    public void persistPort(Port port) {
+        entityManager.getTransaction().begin();
+        entityManager.persist(port);
+        entityManager.getTransaction().commit();
+    }
+
+    @Override
+    public void deletePort(Port port) {
+        entityManager.getTransaction().begin();
+        entityManager.remove(port);
+        entityManager.getTransaction().commit();
+    }
+
+    @Override
+    public Port getPortById(Long id) {
+        return entityManager.find(Port.class, id);
+    }
+
+    @Override
+    public List<Port> retrieveAllPorts(Switch sw) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Port> query = builder.createQuery(Port.class);
+        Root from = query.from(Port.class);
+        query.select(from);
+        query.where(builder.equal(from.get("sw"), sw));
+        TypedQuery<Port> typedQuery = entityManager.createQuery(query);
+        return typedQuery.getResultList();
+    }
+
+    @Override
+    public List<Measurement> queryMeasurementsBySwitch(Switch sw, Date startTime, Date endTime) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Measurement> query = builder.createQuery(Measurement.class);
+        Root from = query.from(Measurement.class);
+        query.select(from);
+        
+        List<Predicate> predicates = new ArrayList<>();
+        
+        Path<String> path = from.get("port").get("sw");
+        predicates.add(builder.equal(path, sw));
+        if (startTime != null && endTime != null) {
+            predicates.add(builder.between(from.get("measureTime"), 
+                startTime, endTime));
+        }
+        
+        query.where(builder.and(predicates.toArray(new Predicate[predicates.size()])));
+        query.orderBy(builder.asc(from.get("measureTime")));
+        
+        TypedQuery<Measurement> typedQuery = entityManager.createQuery(query);
+        return typedQuery.getResultList();
+    }
+
+    @Override
+    public List<Measurement> queryMeasurementsByPort(Port port, Date startTime, Date endTime) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Measurement> query = builder.createQuery(Measurement.class);
+        Root from = query.from(Measurement.class);
+        query.select(from);
+        
+        List<Predicate> predicates = new ArrayList<>();
+        
+        predicates.add(builder.equal(from.get("port"), port));
+        if (startTime != null && endTime != null) {
+            predicates.add(builder.between(from.get("measureTime"), 
+                startTime, endTime));
+        }
+        
+        query.where(builder.and(predicates.toArray(new Predicate[predicates.size()])));
+        query.orderBy(builder.asc(from.get("measureTime")));
+        
+        TypedQuery<Measurement> typedQuery = entityManager.createQuery(query);
+        return typedQuery.getResultList();
+    }
+
+    @Override
+    public List<Measurement> queryMeasurementsBySwitch(Switch sw) {
+        return queryMeasurementsBySwitch(sw, null, null);
+    }
+
+    @Override
+    public List<Measurement> queryMeasurementsByPort(Port port) {
+        return queryMeasurementsByPort(port, null, null);
     }
 }
