@@ -2,8 +2,12 @@ package cn.poe.group1.entity;
 
 import com.google.common.base.Objects;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -19,6 +23,8 @@ public class Switch implements Serializable {
     private String type;
     private int portCount;
     private String comment;
+    @OneToMany(mappedBy="sw", cascade=CascadeType.ALL)
+    private List<Port> ports;
     
     public Switch() {
         // needs to be here because of hibernate
@@ -63,6 +69,21 @@ public class Switch implements Serializable {
 
     public void setPortCount(int portCount) {
         this.portCount = portCount;
+    }
+
+    public List<Port> getPorts() {
+        return ports;
+    }
+
+    public void setPorts(List<Port> ports) {
+        this.ports = ports;
+    }
+    
+    public void addPort(Port port) {
+        if (this.ports == null) {
+            this.ports = new ArrayList<Port>(); 
+        }
+        this.ports.add(port);
     }
     
     @Override

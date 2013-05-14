@@ -2,12 +2,13 @@ package cn.poe.group1.entity;
 
 import com.google.common.base.Objects;
 import java.io.Serializable;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 
 /**
  * The port entity represents a port on a switch.
@@ -17,7 +18,7 @@ public class Port implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @OneToOne (fetch = FetchType.LAZY)
+    @ManyToOne (fetch = FetchType.LAZY, cascade=CascadeType.ALL)
     private Switch sw;
     private Integer portNumber;
     private String comment;

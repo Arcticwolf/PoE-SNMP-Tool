@@ -26,16 +26,12 @@ public class SwitchDataCollector {
         this.backend = backend;
         this.ports = new ArrayList<>();
         timer = new Timer();
-    }
-    
-    public void initPortBase() {
-        for (int i = 0; i < sw.getPortCount(); i++) {
-            Port port = new Port(sw, i, null);
-            backend.persistPort(port);
-            ports.add(new PortDataCollector(port));
+        List<Port> swPorts = sw.getPorts();
+        for (Port p : swPorts) {
+            ports.add(new PortDataCollector(p));
         }
     }
-    
+       
     public void startCollecting() {
         timer.scheduleAtFixedRate(new TimerTask() {
 
