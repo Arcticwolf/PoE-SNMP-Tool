@@ -6,13 +6,15 @@ import cn.poe.group1.entity.Port;
 import cn.poe.group1.entity.PortStatus;
 import cn.poe.group1.entity.Switch;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import javax.persistence.Persistence;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 /**
  * This is a JUnit test class for the measurement database implementation.
@@ -23,7 +25,7 @@ public class MeasurementBackendTest {
     
     @BeforeClass
     public static void init() {
-        backend = new MeasurementDatabase(FACTORY_NAME);
+        backend = new MeasurementDatabase(Persistence.createEntityManagerFactory(FACTORY_NAME).createEntityManager());
     }
 
     @Test
@@ -199,6 +201,25 @@ public class MeasurementBackendTest {
         assertThat(m.getCpeExtPsePortPwrAvailable(), is(measurement.getCpeExtPsePortPwrAvailable()));
         assertThat(m.getCpeExtPsePortPwrConsumption(), is(measurement.getCpeExtPsePortPwrConsumption()));
         assertThat(m.getCpeExtPsePortPwrMax(), is(measurement.getCpeExtPsePortPwrMax()));
+    }
+    
+    @Test
+    public void testPersistSwitchAndPorts_shouldWork() throws Exception {
+        Switch sw = new Switch("test10/id", "testIp", "testtype", 20, "");
+        Port port1 = new Port(sw, 1, "testComment");
+        Port port2 = new Port(sw, 2, "testComment");
+        sw.addPort(port1);
+        sw.addPort(port2);
+        int size_before = backend.retrieveAllPorts(sw).size();
+        backend.persistSwitch(sw);        
+        int size_after = backend.retrieveAllPorts(sw).size();
+        
+        Switch sw1 = backend.getSwitchById("test10/id");
+        assertThat(sw1, notNullValue());
+        List<Port> sw1Ports = sw1.getPorts();
+        assertThat(sw1Ports, notNullValue());
+        assertEquals(2, sw1Ports.size());
+        assertThat(size_after, is(size_before + 2));
     }
     
     private Calendar getBeginTime() {
