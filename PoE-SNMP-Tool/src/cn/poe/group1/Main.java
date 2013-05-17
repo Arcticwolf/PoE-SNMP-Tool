@@ -26,9 +26,9 @@ public class Main {
     private Configuration config;
     private EntityManagerFactory factory;
 
-    public static void main(String[] args) throws IOException {
+    /*public static void main(String[] args) throws IOException {
         Main main = new Main();
-    }
+    }*/
     
     public Main() throws IOException {
         this.config = new PropertyFileConfig();
