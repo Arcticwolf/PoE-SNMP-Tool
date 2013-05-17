@@ -46,10 +46,15 @@ public class PortDataTableModel extends AbstractTableModel
 
     public PortData getRow(int row)
     {
-        if( (row < 0) && (row >= data.size()) )
+        if( (row < 0) || (row >= data.size()) )
             return null;
         
         return this.data.get(row);
+    }
+    
+    public List<PortData> getRowList()
+    {
+        return this.data;
     }
     
     public String getColumnName(int col) {

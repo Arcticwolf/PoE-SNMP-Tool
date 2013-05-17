@@ -4,16 +4,23 @@
  */
 package cn.poe.group1.gui;
 
+import cn.poe.group1.entity.Measurement;
+import cn.poe.group1.entity.Port;
 import cn.poe.group1.entity.Switch;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 /**
  *
@@ -23,8 +30,12 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
 
     private SwitchTableModel switchTableModel;
     private PortDataTableModel portDataTableModel;    
-    private Switch selectedSwitch;
-    private MeasurementBackendAdapter db;
+    private Switch selectedSwitch = null;
+    private PortData selectedPort = null;
+    private MeasurementBackendAdapter db = null;
+    private ChartPanel curChartPanel = null;
+    private XYSeriesCollection curDataSet = null;
+    
     /**
      * Creates new form PoESNMPToolWindow
      */
@@ -33,27 +44,42 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         this.switchTableModel = new SwitchTableModel();
         this.switchTableModel.addSwitchList( db.retrieveAllSwitches() );        
         this.portDataTableModel = new PortDataTableModel();
-        this.selectedSwitch = null;
+        
         initComponents();
+        this.initChart();
         
         this.tblSwitch.getSelectionModel().addListSelectionListener( new ListSelectionListener() {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 selectedSwitch = switchTableModel.getRow(tblSwitch.getSelectedRow());
+                selectedPort = null;
                 refreshMeasurement();
+            }
+        });
+        
+        this.tblPorts.getSelectionModel().addListSelectionListener( new ListSelectionListener() {
+
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                selectedPort = portDataTableModel.getRow( tblPorts.getSelectedRow());
+                updateChart();
             }
         });
     }
 
     public void refreshMeasurement()
     {
-        Date d = new Date();
-        this.lblMeasureTime.setText( d.toString() );
-        this.portDataTableModel.clear();
-        List<PortData> tmp = this.db.retrieveAllPortData(this.selectedSwitch);
-        this.portDataTableModel.addPortDataList( tmp );
+        if( this.selectedSwitch != null)
+        {
+            Date d = new Date();
+            this.lblMeasureTime.setText( d.toString() );
+            this.portDataTableModel.clear();
+            List<PortData> tmp = this.db.retrieveAllPortData(this.selectedSwitch);
+            this.portDataTableModel.addPortDataList( tmp );
+        }
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -132,17 +158,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
 
         pSwitchData.add(jScrollPane2, java.awt.BorderLayout.NORTH);
 
-        javax.swing.GroupLayout pChartLayout = new javax.swing.GroupLayout(pChart);
-        pChart.setLayout(pChartLayout);
-        pChartLayout.setHorizontalGroup(
-            pChartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 517, Short.MAX_VALUE)
-        );
-        pChartLayout.setVerticalGroup(
-            pChartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 175, Short.MAX_VALUE)
-        );
-
+        pChart.setLayout(new java.awt.BorderLayout());
         pSwitchData.add(pChart, java.awt.BorderLayout.CENTER);
 
         pData.add(pSwitchData, java.awt.BorderLayout.CENTER);
@@ -190,6 +206,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
         // TODO add your handling code here:
         this.refreshMeasurement();
+        this.updateChart();
     }//GEN-LAST:event_btnRefreshActionPerformed
 
     /**
@@ -227,23 +244,77 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         });
     }
     
-    /*private void updateChart()
+    private void updateChart()
     {
+        this.curDataSet.removeAllSeries();
+        List<XYSeries> tmp = this.createChartLines();
         
+        for(XYSeries line : tmp)
+            this.curDataSet.addSeries(line);
+     
+        this.curChartPanel.getChart().fireChartChanged();
+    }
+    
+    private void initChart()
+    {
+        JFreeChart chart = createChart();
+        ChartPanel chartPanel = new ChartPanel(chart);
+        this.curChartPanel = new ChartPanel(chart);
+        this.pChart.add(curChartPanel);
+    }
+    
+    private List<XYSeries> createChartLines()
+    {
+        List<XYSeries> lines = new LinkedList<XYSeries>();
+        final XYSeries pwrMaxSeries = new XYSeries("PwrMax");
+        final XYSeries pwrConsumptionSeries = new XYSeries("PwrConsumption");
+
+        if( this.selectedPort != null )
+        {
+                int time = 0;
+                
+                for(Measurement m : this.selectedPort.getMeasurementList() )
+                {
+                    pwrMaxSeries.add(time, m.getCpeExtPsePortPwrMax());
+                    pwrConsumptionSeries.add(time, m.getCpeExtPsePortPwrConsumption());
+                    time++;
+                }
+
+        }
+        
+        lines.add(pwrMaxSeries);
+        lines.add(pwrConsumptionSeries);
+        return lines;
+    }
+    
+    private void createDataset()
+    {
+        final XYSeriesCollection dataset = new XYSeriesCollection();
+        List<XYSeries> tmp = this.createChartLines();
+        
+        for(XYSeries line : tmp)
+            dataset.addSeries(line);
+
+        this.curDataSet = dataset;
     }
     
     private JFreeChart createChart()
     {
-        JFreeChart chart = ChartFactory.createXYLineChart("PortData", "time", "mw", dataset, PlotOrientation.VERTICAL, false, true, false);
+        this.createDataset();
+        JFreeChart chart = ChartFactory.createXYLineChart("PortData", "time", "mw", this.curDataSet, PlotOrientation.VERTICAL, true, true, false);
         XYPlot plot = (XYPlot) chart.getPlot();
+
         plot.setDomainPannable(true);
         plot.setRangePannable(true);
-        plot.setRangeGridlinesVisible(false);
+        final XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+        plot.setRenderer(renderer);
+        
+        plot.setRangeGridlinesVisible(true);
         NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
         rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
         return chart;
         
-    }*/
+    }
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

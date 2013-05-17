@@ -48,8 +48,8 @@ public class DataStub {
         {
             m = new Measurement();
             m.setPort(port);
-            m.setCpeExtPsePortPwrConsumption( DataStub.randomInteger() );
-            m.setCpeExtPsePortPwrMax( DataStub.randomInteger() );
+            m.setCpeExtPsePortPwrConsumption( 200 + DataStub.randomInteger() );
+            m.setCpeExtPsePortPwrMax( 500 + DataStub.randomInteger() );
             tmp.add(m);
         }
         
@@ -58,7 +58,7 @@ public class DataStub {
     
     public static int randomInteger()
     {
-        Double d = Math.random() * 1000;
+        Double d = Math.random() * 100;
         return d.intValue();        
     }
 }

@@ -47,7 +47,7 @@ public class SwitchTableModel extends AbstractTableModel
 
     public Switch getRow(int row)
     {
-        if( (row < 0) && (row >= data.size()) )
+        if( (row < 0) || (row >= data.size()) )
             return null;
         
         return this.data.get(row);
