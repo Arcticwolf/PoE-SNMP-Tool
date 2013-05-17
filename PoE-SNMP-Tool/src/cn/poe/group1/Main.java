@@ -6,6 +6,7 @@ import cn.poe.group1.collector.SwitchDataCollector;
 import cn.poe.group1.db.MeasurementDatabase;
 import cn.poe.group1.entity.Port;
 import cn.poe.group1.entity.Switch;
+import cn.poe.group1.gui.PoESNMPToolGUI;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +27,10 @@ public class Main {
     private Configuration config;
     private EntityManagerFactory factory;
 
-    /*public static void main(String[] args) throws IOException {
-        Main main = new Main();
-    }*/
+    public static void main(String[] args) throws IOException {
+        //Main main = new Main();
+        PoESNMPToolGUI.Main();
+    }
     
     public Main() throws IOException {
         this.config = new PropertyFileConfig();
