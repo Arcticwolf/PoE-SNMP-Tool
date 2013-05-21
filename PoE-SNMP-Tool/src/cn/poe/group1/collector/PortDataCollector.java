@@ -11,7 +11,7 @@ public class PortDataCollector {
     private SNMPDataRetriever retriever;
     
     public PortDataCollector(Port port) {
-        this.retriever = new DummyDataRetriever(port);
+        this.retriever = new DataRetriever(port);
     }
     
     public Measurement takeMeasurement() {
