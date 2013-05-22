@@ -320,6 +320,9 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         List<XYSeries> lines = new LinkedList<XYSeries>();
         final XYSeries pwrMaxSeries = new XYSeries("PwrMax");
         final XYSeries pwrConsumptionSeries = new XYSeries("PwrConsumption");
+        final XYSeries pwrMaxDrawnSeries = new XYSeries("PwrMaxDrawn");
+        final XYSeries pwrAllocatedSeries = new XYSeries("PwrAllocated");
+        final XYSeries pwrAvailableSeries = new XYSeries("PwrAvailable");
 
         if( this.selectedPort != null )
         {
@@ -329,6 +332,9 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                 {
                     pwrMaxSeries.add(time, m.getCpeExtPsePortPwrMax());
                     pwrConsumptionSeries.add(time, m.getCpeExtPsePortPwrConsumption());
+                    pwrMaxDrawnSeries.add(time, m.getCpeExtPsePortMaxPwrDrawn());
+                    pwrAllocatedSeries.add(time, m.getCpeExtPsePortPwrAllocated());
+                    pwrAvailableSeries.add(time, m.getCpeExtPsePortPwrAvailable());
                     time++;
                 }
 
@@ -336,6 +342,9 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         
         lines.add(pwrMaxSeries);
         lines.add(pwrConsumptionSeries);
+        lines.add(pwrAllocatedSeries);
+        lines.add(pwrAvailableSeries);
+        lines.add(pwrMaxDrawnSeries);
         return lines;
     }
     
