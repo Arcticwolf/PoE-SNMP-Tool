@@ -4,9 +4,11 @@
  */
 package cn.poe.group1.gui;
 
+import cn.poe.group1.api.MeasurementBackend;
 import cn.poe.group1.entity.Measurement;
 import cn.poe.group1.entity.Port;
 import cn.poe.group1.entity.Switch;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,7 +34,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     private PortDataTableModel portDataTableModel;    
     private Switch selectedSwitch = null;
     private PortData selectedPort = null;
-    private MeasurementBackendAdapter db = null;
+    private MeasurementBackend db = null;
     private ChartPanel curChartPanel = null;
     private XYSeriesCollection curDataSet = null;
     
@@ -51,7 +53,11 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     }
     
     public PoESNMPToolGUI() {
-        this.db = new MeasurementBackendAdapter();
+        this(new MeasurementBackendAdapter());
+    }
+    
+    public PoESNMPToolGUI(MeasurementBackend backend) {
+        this.db = backend;
         this.switchTableModel = new SwitchTableModel();
         this.switchTableModel.addSwitchList( db.retrieveAllSwitches() );        
         this.portDataTableModel = new PortDataTableModel();
@@ -86,9 +92,20 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
             Date d = new Date();
             this.lblMeasureTime.setText( d.toString() );
             this.portDataTableModel.clear();
-            List<PortData> tmp = this.db.retrieveAllPortData(this.selectedSwitch);
+            List<PortData> tmp = createPortData(this.selectedSwitch);
             this.portDataTableModel.addPortDataList( tmp );
         }
+    }
+    
+    private List<PortData> createPortData(Switch sw) {
+        List<PortData> data = new ArrayList<>();
+        for (Port p : sw.getPorts()) {
+            PortData element = new PortData();
+            element.setPort(p);
+            element.setMeasurementList(db.queryMeasurementsByPort(p));
+            data.add(element);
+        }
+        return data;
     }
 
     /**
@@ -246,7 +263,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void Main()
+    public static void Main( final MeasurementBackend backend)
     {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -274,7 +291,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new PoESNMPToolGUI().setVisible(true);
+                new PoESNMPToolGUI(backend).setVisible(true);
             }
         });
     }

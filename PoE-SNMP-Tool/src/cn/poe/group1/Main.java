@@ -28,8 +28,7 @@ public class Main {
     private EntityManagerFactory factory;
 
     public static void main(String[] args) throws IOException {
-        //Main main = new Main();
-        PoESNMPToolGUI.Main();
+        Main main = new Main();
     }
     
     public Main() throws IOException {
@@ -49,6 +48,8 @@ public class Main {
             }
             measurementBackend.persistSwitch(sw);
         }
+        
+        PoESNMPToolGUI.Main(measurementBackend);
         
         // Load all switches from DB 
         List<Switch> switches = measurementBackend.retrieveAllSwitches();
