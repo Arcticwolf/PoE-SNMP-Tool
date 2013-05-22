@@ -28,7 +28,7 @@ public class SwitchDataCollector {
         timer = new Timer();
         List<Port> swPorts = sw.getPorts();
         for (Port p : swPorts) {
-            ports.add(new PortDataCollector(p));
+            ports.add(new PortDataCollector(p, configuration));
         }
     }
        

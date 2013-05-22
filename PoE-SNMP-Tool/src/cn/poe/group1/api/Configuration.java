@@ -15,4 +15,12 @@ public interface Configuration {
      * seconds.
      */
     int getMeasurementInterval();
+    
+    /**
+     * Returns the class name of the data retriever implementation. In case of
+     * an error or if the value is not set, the default value of the 
+     * DummyDataRetriever is returnde
+     * @return the implementing class of the data retriever interface.
+     */
+    String getDataRetrieverImpl();
 }
