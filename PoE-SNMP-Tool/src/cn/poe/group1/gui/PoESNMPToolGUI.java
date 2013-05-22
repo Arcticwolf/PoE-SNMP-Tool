@@ -38,6 +38,8 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     private ChartPanel curChartPanel = null;
     private XYSeriesCollection curDataSet = null;
     
+    private Date measurementStartDate = null;
+    private Date measurementEndDate = null;
     /**
      * Creates new form PoESNMPToolWindow
      */
@@ -61,6 +63,9 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         this.switchTableModel = new SwitchTableModel();
         this.switchTableModel.addSwitchList( db.retrieveAllSwitches() );        
         this.portDataTableModel = new PortDataTableModel();
+        
+        this.measurementStartDate = new Date();
+        this.measurementEndDate = new Date( this.measurementStartDate.getTime() + (86400 * 100));
         
         initComponents();
         this.initChart();
@@ -117,14 +122,26 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jCalendar1 = new com.toedter.calendar.JCalendar();
         pMain = new javax.swing.JPanel();
         pSideBar = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblSwitch = new javax.swing.JTable();
         pData = new javax.swing.JPanel();
         pSwitchInfo = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        pMeasurementTime = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jDateChooser1 = new com.toedter.calendar.JDateChooser();
+        jComboBox1 = new javax.swing.JComboBox();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jDateChooser2 = new com.toedter.calendar.JDateChooser();
+        jComboBox2 = new javax.swing.JComboBox();
+        jLabel5 = new javax.swing.JLabel();
+        btnRefresh2 = new javax.swing.JButton();
+        pRefreshTime = new javax.swing.JPanel();
         lblMeasureTime = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
         pSwitchData = new javax.swing.JPanel();
         jspSwitchData = new javax.swing.JSplitPane();
         pChart = new javax.swing.JPanel();
@@ -151,42 +168,120 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
 
         pData.setLayout(new java.awt.BorderLayout());
 
+        pSwitchInfo.setMinimumSize(new java.awt.Dimension(100, 80));
         pSwitchInfo.setName(""); // NOI18N
-        pSwitchInfo.setPreferredSize(new java.awt.Dimension(517, 40));
+        pSwitchInfo.setPreferredSize(new java.awt.Dimension(517, 80));
+        pSwitchInfo.setLayout(new java.awt.BorderLayout());
+
+        pMeasurementTime.setPreferredSize(new java.awt.Dimension(517, 30));
+
+        jLabel2.setText("Messung Start");
+
+        jDateChooser1.setMinSelectableDate(new java.util.Date(-62135769517000L));
+        jDateChooser1.setMinimumSize(new java.awt.Dimension(150, 27));
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23" }));
+
+        jLabel3.setText("Messung Ende");
+
+        jLabel4.setText("Uhr");
+
+        jDateChooser2.setMinimumSize(new java.awt.Dimension(150, 27));
+
+        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23" }));
+
+        jLabel5.setText("Uhr");
+
+        btnRefresh2.setText("Refresh");
+        btnRefresh2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefresh2ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pMeasurementTimeLayout = new javax.swing.GroupLayout(pMeasurementTime);
+        pMeasurementTime.setLayout(pMeasurementTimeLayout);
+        pMeasurementTimeLayout.setHorizontalGroup(
+            pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pMeasurementTimeLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel2)
+                .addGap(18, 18, 18)
+                .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(4, 4, 4)
+                .addComponent(jLabel4)
+                .addGap(45, 45, 45)
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jDateChooser2, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnRefresh2)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        pMeasurementTimeLayout.setVerticalGroup(
+            pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pMeasurementTimeLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel5)
+                        .addComponent(btnRefresh2))
+                    .addComponent(jDateChooser2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jDateChooser1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jComboBox1)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel4))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        pSwitchInfo.add(pMeasurementTime, java.awt.BorderLayout.CENTER);
+
+        pRefreshTime.setPreferredSize(new java.awt.Dimension(649, 30));
 
         jLabel1.setText("Stand:");
 
-        javax.swing.GroupLayout pSwitchInfoLayout = new javax.swing.GroupLayout(pSwitchInfo);
-        pSwitchInfo.setLayout(pSwitchInfoLayout);
-        pSwitchInfoLayout.setHorizontalGroup(
-            pSwitchInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pSwitchInfoLayout.createSequentialGroup()
+        javax.swing.GroupLayout pRefreshTimeLayout = new javax.swing.GroupLayout(pRefreshTime);
+        pRefreshTime.setLayout(pRefreshTimeLayout);
+        pRefreshTimeLayout.setHorizontalGroup(
+            pRefreshTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pRefreshTimeLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addComponent(lblMeasureTime, javax.swing.GroupLayout.PREFERRED_SIZE, 339, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(101, Short.MAX_VALUE))
-        );
-        pSwitchInfoLayout.setVerticalGroup(
-            pSwitchInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pSwitchInfoLayout.createSequentialGroup()
-                .addContainerGap(13, Short.MAX_VALUE)
-                .addGroup(pSwitchInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(lblMeasureTime))
+                .addGap(22, 22, 22)
+                .addComponent(lblMeasureTime, javax.swing.GroupLayout.PREFERRED_SIZE, 637, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
+        pRefreshTimeLayout.setVerticalGroup(
+            pRefreshTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(lblMeasureTime, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+
+        pSwitchInfo.add(pRefreshTime, java.awt.BorderLayout.PAGE_START);
 
         pData.add(pSwitchInfo, java.awt.BorderLayout.NORTH);
 
         pSwitchData.setLayout(new java.awt.BorderLayout());
 
         jspSwitchData.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jspSwitchData.setMinimumSize(new java.awt.Dimension(23, 600));
 
+        pChart.setMinimumSize(new java.awt.Dimension(0, 300));
         pChart.setPreferredSize(new java.awt.Dimension(0, 300));
         pChart.setLayout(new java.awt.BorderLayout());
         jspSwitchData.setBottomComponent(pChart);
 
+        jScrollPane2.setMinimumSize(new java.awt.Dimension(23, 300));
         jScrollPane2.setPreferredSize(new java.awt.Dimension(453, 300));
 
         tblPorts.setModel(this.portDataTableModel);
@@ -249,16 +344,25 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_btnExitActionPerformed
 
-    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
-        // TODO add your handling code here:
+    private void refresh()
+    {
         this.refreshMeasurement();
         this.updateChart();
+    }
+    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
+        // TODO add your handling code here:
+        this.refresh();
     }//GEN-LAST:event_btnRefreshActionPerformed
 
     private void btnReloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReloadActionPerformed
         // TODO add your handling code here:
         this.reloadSwitches();
     }//GEN-LAST:event_btnReloadActionPerformed
+
+    private void btnRefresh2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefresh2ActionPerformed
+        // TODO add your handling code here:
+        this.refresh();
+    }//GEN-LAST:event_btnRefresh2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -381,8 +485,18 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnExit;
     private javax.swing.JButton btnRefresh;
+    private javax.swing.JButton btnRefresh2;
     private javax.swing.JButton btnReload;
+    private com.toedter.calendar.JCalendar jCalendar1;
+    private javax.swing.JComboBox jComboBox1;
+    private javax.swing.JComboBox jComboBox2;
+    private com.toedter.calendar.JDateChooser jDateChooser1;
+    private com.toedter.calendar.JDateChooser jDateChooser2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JToolBar jToolBar1;
@@ -391,6 +505,8 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     private javax.swing.JPanel pChart;
     private javax.swing.JPanel pData;
     private javax.swing.JPanel pMain;
+    private javax.swing.JPanel pMeasurementTime;
+    private javax.swing.JPanel pRefreshTime;
     private javax.swing.JPanel pSideBar;
     private javax.swing.JPanel pSwitchData;
     private javax.swing.JPanel pSwitchInfo;
