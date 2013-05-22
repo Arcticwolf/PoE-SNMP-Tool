@@ -4,6 +4,8 @@ import cn.poe.group1.api.MeasurementBackend;
 import cn.poe.group1.entity.Measurement;
 import cn.poe.group1.entity.Port;
 import cn.poe.group1.entity.Switch;
+import cn.poe.group1.gui.DataStub;
+import cn.poe.group1.gui.PortData;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -141,5 +143,18 @@ public class MeasurementDatabase implements MeasurementBackend {
     @Override
     public List<Measurement> queryMeasurementsByPort(Port port) {
         return queryMeasurementsByPort(port, null, null);
+    }
+    
+    @Override
+    public List<PortData> retrieveAllPortData(Switch sw, Date startTime, Date endTime)
+    {
+        List<PortData> tmp = PortData.createPortDataList( this.retrieveAllPorts(sw));
+        
+        for(PortData pd : tmp)
+        {
+            pd.setMeasurementList( this.queryMeasurementsByPort(pd.getPort(), startTime, endTime));                        
+        }
+        
+        return tmp;        
     }
 }
