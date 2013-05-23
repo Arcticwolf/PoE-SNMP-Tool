@@ -58,12 +58,6 @@ public class Main {
         log.info("Loaded switches from db. Found: {}", switches.size());
         for (Switch s : switches) {
             collector.addSwitch(s);
-        }
-        
-        log.info("Start collecting measurements. Press Enter to quit.");
-        System.in.read();
-        log.info("Quit taking measurements.");
-        collector.shutdown();
-        
+        }        
     }
 }
