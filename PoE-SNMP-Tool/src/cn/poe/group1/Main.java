@@ -1,6 +1,7 @@
 package cn.poe.group1;
 
 import cn.poe.group1.api.Configuration;
+import cn.poe.group1.api.DataCollector;
 import cn.poe.group1.api.MeasurementBackend;
 import cn.poe.group1.collector.SwitchDataCollector;
 import cn.poe.group1.db.MeasurementDatabase;
@@ -25,6 +26,7 @@ public class Main {
     private HashMap<String, SwitchDataCollector> collectors;
     private Configuration config;
     private EntityManagerFactory factory;
+    private DataCollector collector;
 
     public static void main(String[] args) throws IOException {
         Main main = new Main();
@@ -35,6 +37,7 @@ public class Main {
         this.collectors = new HashMap<>();
         this.factory = Persistence.createEntityManagerFactory(FACTORY_NAME);
         this.measurementBackend = new MeasurementDatabase(this.factory.createEntityManager());
+        collector = new DataCollectorImpl(config, factory);
         
         log.info("measurement interval : {}", config.getMeasurementInterval());
         
@@ -48,45 +51,19 @@ public class Main {
             measurementBackend.persistSwitch(sw);
         }
         
-        PoESNMPToolGUI.Main(measurementBackend, this);
+        PoESNMPToolGUI.Main(measurementBackend, collector);
         
         // Load all switches from DB 
         List<Switch> switches = measurementBackend.retrieveAllSwitches();
         log.info("Loaded switches from db. Found: {}", switches.size());
         for (Switch s : switches) {
-            collectors.put(s.getIdentifier(), new SwitchDataCollector(s, config, new MeasurementDatabase(this.factory.createEntityManager())));
+            collector.addSwitch(s);
         }
         
-        startCollecting();
-        System.in.read();
-        stopCollecting();
-    }
-    
-    public void startCollecting() {
-        for (SwitchDataCollector c : collectors.values()) {
-            c.startCollecting();
-        }
         log.info("Start collecting measurements. Press Enter to quit.");
-    }
-    
-    public void stopCollecting() {
-        for (SwitchDataCollector c : collectors.values()) {
-            c.stopCollecting();
-        }
+        System.in.read();
         log.info("Quit taking measurements.");
-    }
-    
-    public void addSwitch(Switch sw) {
-        SwitchDataCollector c = new SwitchDataCollector(sw, config,  new MeasurementDatabase(this.factory.createEntityManager()));
-        collectors.put(sw.getIdentifier(), c);
-        c.startCollecting();
-    }
-    
-    public void removeSwitch(Switch sw) {
-        SwitchDataCollector collector = collectors.get(sw.getIdentifier());
-        if (collector != null) {
-            collector.stopCollecting();
-        }
-        collectors.remove(sw.getIdentifier());
+        collector.shutdown();
+        
     }
 }

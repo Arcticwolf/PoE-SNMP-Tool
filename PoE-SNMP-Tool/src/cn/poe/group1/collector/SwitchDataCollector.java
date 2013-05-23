@@ -32,7 +32,7 @@ public class SwitchDataCollector {
         }
     }
        
-    public void startCollecting() {
+    public void startCollecting(long delay) {
         timer.scheduleAtFixedRate(new TimerTask() {
 
             @Override
@@ -42,7 +42,7 @@ public class SwitchDataCollector {
                 }
             }
             
-        }, 0, configuration.getMeasurementInterval());
+        }, delay, configuration.getMeasurementInterval());
     }
     
     public void stopCollecting() {

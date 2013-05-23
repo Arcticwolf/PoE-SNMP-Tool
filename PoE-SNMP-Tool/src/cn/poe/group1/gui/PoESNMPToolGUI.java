@@ -1,6 +1,7 @@
 package cn.poe.group1.gui;
 
 import cn.poe.group1.Main;
+import cn.poe.group1.api.DataCollector;
 import cn.poe.group1.api.MeasurementBackend;
 import cn.poe.group1.entity.Measurement;
 import cn.poe.group1.entity.Port;
@@ -42,14 +43,14 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     private MeasurementBackend db = null;
     private ChartPanel curChartPanel = null;
     private XYSeriesCollection curDataSet = null;
-    private Main main;
+    private DataCollector collector;
     
     private Date measurementStartDate = null;
     private Date measurementEndDate = null;
     
-    public PoESNMPToolGUI(MeasurementBackend backend, Main main) {
+    public PoESNMPToolGUI(MeasurementBackend backend, DataCollector collector) {
         this(backend);
-        this.main = main;
+        this.collector = collector;
     }
     
     /**
@@ -223,7 +224,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                 JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
         if (result == JOptionPane.OK_OPTION) {
             try {
-                main.removeSwitch(sw);
+                collector.removeSwitch(sw);
                 db.deleteSwitch(sw);
                 reloadSwitches();
             } catch (Exception ex) {
@@ -240,7 +241,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                 sw.addPort(p);
             }
             db.persistSwitch(sw);
-            main.addSwitch(sw);
+            collector.addSwitch(sw);
             reloadSwitches();
         } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Failed to save switch", 
@@ -252,7 +253,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void Main( final MeasurementBackend backend, final Main main)
+    public static void Main( final MeasurementBackend backend, final DataCollector collector)
     {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -279,7 +280,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new PoESNMPToolGUI(backend, main).setVisible(true);
+                new PoESNMPToolGUI(backend, collector).setVisible(true);
             }
         });
     }
@@ -366,7 +367,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
 
         jLabel5.setText("Uhr");
 
-        btnRefresh2.setText("Refresh");
+        btnRefresh2.setText("Reload");
         btnRefresh2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnRefresh2ActionPerformed(evt);
@@ -396,7 +397,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnRefresh2)
-                .addContainerGap(189, Short.MAX_VALUE))
+                .addContainerGap(46, Short.MAX_VALUE))
         );
         pMeasurementTimeLayout.setVerticalGroup(
             pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -405,7 +406,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                 .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jdcStartDate, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
+                        .addComponent(jdcStartDate, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(cbStartHour)
                             .addComponent(jLabel3)
@@ -416,7 +417,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                             .addComponent(cbEndHour, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel5)
                             .addComponent(btnRefresh2))))
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pSwitchInfo.add(pMeasurementTime, java.awt.BorderLayout.CENTER);
