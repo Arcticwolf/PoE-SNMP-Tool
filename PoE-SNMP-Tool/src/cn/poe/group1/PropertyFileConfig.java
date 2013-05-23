@@ -13,6 +13,7 @@ public class PropertyFileConfig implements Configuration {
     private static Logger log = LoggerFactory.getLogger(PropertyFileConfig.class);
     private static final String PROPERTY_FILE_NAME = "config";
     private static final String MEASUREMENT_INTERVAL = "measurement.interval";
+    private static final String DISTRIBUTION_SLOTS = "distribution.slots";
     private static final String DATA_RETRIEVER_IMPL = "data.retriever.impl";
     private final ResourceBundle bundle;
     
@@ -26,8 +27,14 @@ public class PropertyFileConfig implements Configuration {
     }
     
     @Override
+    public int getDistributionSlots() {
+        return getIntValue(DISTRIBUTION_SLOTS, 10);
+    }
+    
+    @Override
     public String getDataRetrieverImpl() {
-        return getStringValue(DATA_RETRIEVER_IMPL, "cn.poe.group1.collector.DummyDataRetriever");
+        return getStringValue(DATA_RETRIEVER_IMPL, 
+                "cn.poe.group1.collector.DummyDataRetriever");
     }
     
     private String getStringValue(String name, String defaultValue) {

@@ -28,8 +28,8 @@ public class DataCollectorImpl implements DataCollector {
         SwitchDataCollector c = new SwitchDataCollector(sw, config,  
                 new MeasurementDatabase(this.factory.createEntityManager()));
         collectors.put(sw, c);
-        int interval = config.getMeasurementInterval() / 10;
-        int factor = (collectors.size() - 1) % 10;
+        int interval = config.getMeasurementInterval() / config.getDistributionSlots();
+        int factor = (collectors.size() - 1) % config.getDistributionSlots();
         c.startCollecting(interval * factor);
     }
 

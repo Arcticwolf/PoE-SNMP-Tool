@@ -17,6 +17,17 @@ public interface Configuration {
     int getMeasurementInterval();
     
     /**
+     * Returns the amount of slots which should be created in the measurement 
+     * interval. All SwitchDataCollector instances which are created are 
+     * distributed equally in the slots to avoid performance requirement peaks. 
+     * In case of an error or if the value is not set, the default value 10 is
+     * returned.
+     * @return The amount of slots which should be created in the measurement 
+     * interval.
+     */
+    int getDistributionSlots();
+    
+    /**
      * Returns the class name of the data retriever implementation. In case of
      * an error or if the value is not set, the default value of the 
      * DummyDataRetriever is returnde
