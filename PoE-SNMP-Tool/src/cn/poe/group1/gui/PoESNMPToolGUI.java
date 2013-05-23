@@ -150,7 +150,8 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         for (Port p : sw.getPorts()) {
             PortData element = new PortData();
             element.setPort(p);
-            element.setMeasurementList(db.queryMeasurementsByPort(p));
+            element.setMeasurementList(db.queryMeasurementsByPort(p, 
+                    jdcStartDate.getDate(), jdcEndDate.getDate()));
             data.add(element);
         }
         return data;
@@ -276,7 +277,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                 .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jdcStartDate, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
+                        .addComponent(jdcStartDate, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(cbStartHour)
                             .addComponent(jLabel3)

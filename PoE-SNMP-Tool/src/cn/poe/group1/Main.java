@@ -40,7 +40,7 @@ public class Main {
         log.info("measurement interval : {}", config.getMeasurementInterval());
         
         // Just for testing impact of one MeasurementDatabase per thread
-        for (int i=0; i<50; i++) {
+        for (int i=0; i<5; i++) {
             Switch sw = new Switch("testid_"+String.valueOf(i), "testIp", "testtype", 24, "testswitch");
             for (int j=0; j<sw.getPortCount(); j++) {
                 Port p = new Port(sw, j, null);
