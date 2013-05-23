@@ -86,17 +86,4 @@ public class MeasurementBackendAdapter implements MeasurementBackend
         else
             return null;
     }
-    
-    @Override
-    public List<PortData> retrieveAllPortData(Switch sw, Date startTime, Date endTime)
-    {
-        List<PortData> tmp = PortData.createPortDataList( this.retrieveAllPorts(sw));
-        
-        for(PortData pd : tmp)
-        {
-            pd.setMeasurementList( DataStub.getMeasurementList(pd.getPort()));                        
-        }
-        
-        return tmp;        
-    }
 }

@@ -149,17 +149,4 @@ public class MeasurementDatabase implements MeasurementBackend {
     public List<Measurement> queryMeasurementsByPort(Port port) {
         return queryMeasurementsByPort(port, null, null);
     }
-    
-    @Override
-    public List<PortData> retrieveAllPortData(Switch sw, Date startTime, Date endTime)
-    {
-        List<PortData> tmp = PortData.createPortDataList( this.retrieveAllPorts(sw));
-        
-        for(PortData pd : tmp)
-        {
-            pd.setMeasurementList( this.queryMeasurementsByPort(pd.getPort(), startTime, endTime));                        
-        }
-        
-        return tmp;        
-    }
 }

@@ -33,24 +33,6 @@ public class PortData {
         this.avgCpeExtPsePortPwrMax = 0;
     }
     
-    public static List<PortData> createPortDataList(List<Port> portList)
-    {
-        List<PortData> pdList = new LinkedList<PortData>();
-        if(portList == null)
-            return pdList;
-        
-        
-        PortData pd = null;        
-        for(Port p : portList)
-        {
-            pd = new PortData();
-            pd.setPort(p);
-            pdList.add(pd);
-        }
-        
-        return pdList;
-    }
-    
     private void calcPortData()
     {
         this.avgCpeExtPsePortMaxPwrDrawn = 0;
