@@ -7,10 +7,16 @@ import java.util.GregorianCalendar;
 import javax.swing.JComboBox;
 
 /**
- *
+ * The GUIUtils class separates some functionality that is not directly related
+ * to the GUI in an own file.
  */
 public class GUIUtils {
     
+    /**
+     * Gets the current day + offset days.
+     * @param dayOffset the amount of days that should be added.
+     * @return The current Date + dayOffset days.
+     */
     public static Date getCurrentDay(int dayOffset) {
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTimeInMillis(System.currentTimeMillis());
@@ -20,6 +26,13 @@ public class GUIUtils {
         return cal.getTime();
     }
     
+    /**
+     * Creates a Date object out of the JDateChooser and a JComboBox representing
+     * the hour.
+     * @param date A JDateChooser holding the date.
+     * @param hour A JComboBox holding the hour.
+     * @return The resulting Date object.
+     */
     public static Date buildDateTime(JDateChooser date, JComboBox hour) {
         Calendar time = Calendar.getInstance();
         time.setTime(date.getDate());

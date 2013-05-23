@@ -30,6 +30,8 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         Main main = new Main();
+        log.info("Finished initializing. Start GUI.");
+        PoESNMPToolGUI.Main(main.getBackend(), main.getDataCollector());
     }
     
     public Main() throws IOException {
@@ -37,10 +39,23 @@ public class Main {
         this.collectors = new HashMap<>();
         this.factory = Persistence.createEntityManagerFactory(FACTORY_NAME);
         this.measurementBackend = new MeasurementDatabase(this.factory.createEntityManager());
-        collector = new DataCollectorImpl(config, factory);
+        this.collector = new DataCollectorImpl(config, factory);
         
         log.info("measurement interval : {}", config.getMeasurementInterval());
+        log.info("distribution slots : {}", config.getDistributionSlots());
+        log.info("data retriever implementation : {}", config.getDataRetrieverImpl());
         
+        addTestSwitches();
+        
+        // Load all switches from DB 
+        List<Switch> switches = measurementBackend.retrieveAllSwitches();
+        log.info("Loaded switches from db. Found: {}", switches.size());
+        for (Switch s : switches) {
+            collector.addSwitch(s);
+        }        
+    }
+    
+    private void addTestSwitches() {
         // Just for testing impact of one MeasurementDatabase per thread
         for (int i=0; i<5; i++) {
             Switch sw = new Switch("testid_"+String.valueOf(i), "testIp", "testtype", 24, "testswitch");
@@ -50,14 +65,13 @@ public class Main {
             }
             measurementBackend.persistSwitch(sw);
         }
-        
-        PoESNMPToolGUI.Main(measurementBackend, collector);
-        
-        // Load all switches from DB 
-        List<Switch> switches = measurementBackend.retrieveAllSwitches();
-        log.info("Loaded switches from db. Found: {}", switches.size());
-        for (Switch s : switches) {
-            collector.addSwitch(s);
-        }        
+    }
+    
+    public MeasurementBackend getBackend() {
+        return this.measurementBackend;
+    }
+    
+    public DataCollector getDataCollector() {
+        return this.collector;
     }
 }

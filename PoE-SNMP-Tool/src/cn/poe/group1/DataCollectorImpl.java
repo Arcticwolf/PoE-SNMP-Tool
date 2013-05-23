@@ -10,7 +10,9 @@ import java.util.Map;
 import javax.persistence.EntityManagerFactory;
 
 /**
- *
+ * The implementation of the DataCollector interface. This implementation holds
+ * all active SwitchDataCollector and distributes the collectors equally in 
+ * time slots.
  */
 public class DataCollectorImpl implements DataCollector {
     private Configuration config;
