@@ -1,19 +1,16 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package cn.poe.group1.gui;
 
 import cn.poe.group1.Main;
 import cn.poe.group1.api.MeasurementBackend;
 import cn.poe.group1.entity.Measurement;
 import cn.poe.group1.entity.Port;
+import cn.poe.group1.entity.PortData;
 import cn.poe.group1.entity.Switch;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,11 +47,6 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     private Date measurementStartDate = null;
     private Date measurementEndDate = null;
     
-    
-    public PoESNMPToolGUI() {
-        this(new MeasurementBackendAdapter());
-    }
-    
     public PoESNMPToolGUI(MeasurementBackend backend, Main main) {
         this(backend);
         this.main = main;
@@ -72,10 +64,10 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         
         this.jdcStartDate.setDate(GUIUtils.getCurrentDay(0));
         this.jdcEndDate.setDate(GUIUtils.getCurrentDay(1));
+        Calendar calendar = Calendar.getInstance();
+        this.cbStartHour.setSelectedIndex(calendar.get(Calendar.HOUR_OF_DAY));
+        this.cbEndHour.setSelectedIndex(calendar.get(Calendar.HOUR_OF_DAY));
         refreshMeasurementDates();
-        
-        this.cbStartHour.setSelectedIndex(8);
-        this.cbEndHour.setSelectedIndex(8);
         
         JFreeChart chart = createChart();
         this.curChartPanel = new ChartPanel(chart);
@@ -121,8 +113,6 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     private void refreshMeasurementDates() {
         this.measurementStartDate = GUIUtils.buildDateTime(jdcStartDate, cbStartHour);        
         this.measurementEndDate = GUIUtils.buildDateTime(jdcEndDate, cbEndHour);
-        System.out.println("start: " + measurementStartDate);
-        System.out.println("end: " + measurementEndDate);
     }
     
     private void refresh() {
@@ -135,21 +125,10 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         if( this.selectedSwitch != null) {
             this.lblMeasureTime.setText(new Date().toString());
             this.portDataTableModel.clear();
-            List<PortData> tmp = createPortData(this.selectedSwitch);
+            List<PortData> tmp = db.queryPortData(selectedSwitch, 
+                    measurementStartDate, measurementEndDate);
             this.portDataTableModel.addPortDataList( tmp );
         }
-    }
-    
-    private List<PortData> createPortData(Switch sw) {
-        List<PortData> data = new ArrayList<>();
-        for (Port p : sw.getPorts()) {
-            PortData element = new PortData();
-            element.setPort(p);
-            element.setMeasurementList(db.queryMeasurementsByPort(p, 
-                    measurementStartDate, measurementEndDate));
-            data.add(element);
-        }
-        return data;
     }
     
     //<editor-fold defaultstate="collapsed" desc="All functions for the showing the chart">
@@ -200,7 +179,8 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
 
         if( this.selectedPort != null ) {
             int time = 0;
-            for(Measurement m : this.selectedPort.getMeasurementList() ) {
+            for(Measurement m : db.queryMeasurementsByPort(this.selectedPort.getPort(), 
+                    measurementStartDate, measurementEndDate) ) {
                 pwrMaxSeries.add(time, m.getCpeExtPsePortPwrMax());
                 pwrConsumptionSeries.add(time, m.getCpeExtPsePortPwrConsumption());
                 pwrMaxDrawnSeries.add(time, m.getCpeExtPsePortMaxPwrDrawn());

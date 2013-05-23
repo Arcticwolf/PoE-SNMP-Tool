@@ -3,12 +3,13 @@ package cn.poe.group1.db;
 import cn.poe.group1.api.MeasurementBackend;
 import cn.poe.group1.entity.Measurement;
 import cn.poe.group1.entity.Port;
+import cn.poe.group1.entity.PortData;
 import cn.poe.group1.entity.Switch;
-import cn.poe.group1.gui.DataStub;
-import cn.poe.group1.gui.PortData;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
@@ -148,5 +149,55 @@ public class MeasurementDatabase implements MeasurementBackend {
     @Override
     public List<Measurement> queryMeasurementsByPort(Port port) {
         return queryMeasurementsByPort(port, null, null);
+    }
+    
+    @Override
+    public List<PortData> queryPortData(Switch sw, Date startTime, Date endTime) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery query = builder.createQuery();
+        
+        Root from = query.from(Measurement.class);
+        query.multiselect(from.get("port").get("portNumber"),
+                builder.avg(from.get("cpeExtPsePortPwrMax")),
+                builder.avg(from.get("cpeExtPsePortPwrAllocated")),
+                builder.avg(from.get("cpeExtPsePortPwrAvailable")),
+                builder.avg(from.get("cpeExtPsePortPwrConsumption")),
+                builder.avg(from.get("cpeExtPsePortMaxPwrDrawn")));
+        
+        List<Predicate> predicates = new ArrayList<>();
+        
+        Path<String> path = from.get("port").get("sw");
+        predicates.add(builder.equal(path, sw));
+        if (startTime != null && endTime != null) {
+            predicates.add(builder.between(from.get("measureTime"), 
+                startTime, endTime));
+        }
+        
+        query.where(builder.and(predicates.toArray(new Predicate[predicates.size()])));
+        query.groupBy(from.get("port"));
+        query.orderBy(builder.asc(from.get("port").get("portNumber")));
+        Query qu = entityManager.createQuery(query);
+        List<Object[]> data = qu.getResultList();
+        Map<Integer, PortData> cache = new HashMap<>();
+        List<PortData> result = new ArrayList<>();
+        for (Object[] row : data) {
+            PortData port = new PortData();
+            Integer portNumber = Integer.parseInt(row[0].toString());
+            port.setAvgCpeExtPsePortPwrMax((int) Double.parseDouble(row[1].toString()));
+            port.setAvgCpeExtPsePortPwrAllocated((int) Double.parseDouble(row[2].toString()));
+            port.setAvgCpeExtPsePortPwrAvailable((int) Double.parseDouble(row[3].toString()));
+            port.setAvgCpeExtPsePortPwrConsumption((int) Double.parseDouble(row[4].toString()));
+            port.setAvgCpeExtPsePortMaxPwrDrawn((int) Double.parseDouble(row[5].toString()));
+            cache.put(portNumber, port);
+        }
+        for (Port port : sw.getPorts()) {
+            PortData pd = cache.get(port.getPortNumber());
+            if (pd == null) {
+                pd = new PortData();
+            }
+            pd.setPort(port);
+            result.add(pd);
+        }
+        return result;
     }
 }

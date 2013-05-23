@@ -1,10 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package cn.poe.group1.gui;
 
-import cn.poe.group1.entity.Switch;
+import cn.poe.group1.entity.PortData;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;

@@ -3,7 +3,7 @@ package cn.poe.group1.api;
 import cn.poe.group1.entity.Measurement;
 import cn.poe.group1.entity.Port;
 import cn.poe.group1.entity.Switch;
-import cn.poe.group1.gui.PortData;
+import cn.poe.group1.entity.PortData;
 import java.util.Date;
 import java.util.List;
 
@@ -107,4 +107,6 @@ public interface MeasurementBackend {
      * @return A list of all port objects for a switch which are currently persisted.
      */
     List<Port> retrieveAllPorts(Switch sw);
+    
+    List<PortData> queryPortData(Switch sw, Date startTime, Date endTime);
 }
