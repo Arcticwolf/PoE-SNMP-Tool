@@ -14,9 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.JMenuItem;
@@ -51,42 +49,37 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     
     private Date measurementStartDate = null;
     private Date measurementEndDate = null;
-    /**
-     * Creates new form PoESNMPToolWindow
-     */
     
-    private void reloadSwitches()
-    {
-        this.switchTableModel.clear();
-        this.portDataTableModel.clear();
-        this.switchTableModel.addSwitchList(this.db.retrieveAllSwitches());
-        this.selectedSwitch = null;
-        this.selectedPort = null;
-        
-    }
     
     public PoESNMPToolGUI() {
         this(new MeasurementBackendAdapter());
     }
     
+    public PoESNMPToolGUI(MeasurementBackend backend, Main main) {
+        this(backend);
+        this.main = main;
+    }
+    
+    /**
+     * Creates new form PoESNMPToolWindow
+     */
     public PoESNMPToolGUI(MeasurementBackend backend) {
         this.db = backend;
         this.switchTableModel = new SwitchTableModel();
         this.switchTableModel.addSwitchList( db.retrieveAllSwitches() );        
-        this.portDataTableModel = new PortDataTableModel();
-        
-        this.measurementStartDate = this.getCurrentDay(0);
-        this.measurementEndDate = this.getCurrentDay(1);
-        
+        this.portDataTableModel = new PortDataTableModel();        
         initComponents();
         
-        this.jdcStartDate.setDate(measurementStartDate);
-        this.jdcEndDate.setDate(measurementEndDate);
+        this.jdcStartDate.setDate(GUIUtils.getCurrentDay(0));
+        this.jdcEndDate.setDate(GUIUtils.getCurrentDay(1));
+        refreshMeasurementDates();
         
         this.cbStartHour.setSelectedIndex(8);
         this.cbEndHour.setSelectedIndex(8);
         
-        this.initChart();
+        JFreeChart chart = createChart();
+        this.curChartPanel = new ChartPanel(chart);
+        this.pChart.add(curChartPanel);
         
         this.tblSwitch.getSelectionModel().addListSelectionListener( new ListSelectionListener() {
 
@@ -101,10 +94,10 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         this.tblSwitch.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-				if (e.isPopupTrigger()) {
-		        	showContextMenu(e);
-		        }
-			}
+                if (e.isPopupTrigger()) {
+                    showContextMenu(e);
+		}
+            }
         });
         
         this.tblPorts.getSelectionModel().addListSelectionListener( new ListSelectionListener() {
@@ -117,55 +110,30 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         });
     }
     
-    public PoESNMPToolGUI(MeasurementBackend backend, Main main) {
-        this(backend);
-        this.main = main;
-    }
-    
-    public void setMain(Main main) {
-        this.main = main;
+    private void reloadSwitches() {
+        this.switchTableModel.clear();
+        this.portDataTableModel.clear();
+        this.switchTableModel.addSwitchList(this.db.retrieveAllSwitches());
+        this.selectedSwitch = null;
+        this.selectedPort = null;
     }
 
-    private void refreshMeasurementDates()
-    {
-        this.measurementStartDate = this.jdcStartDate.getDate();
-        this.measurementStartDate = this.eraseTime(this.measurementStartDate);
-        this.measurementStartDate.setTime( this.measurementStartDate.getTime() + (this.cbStartHour.getSelectedIndex() * 3600 * 1000));
-        
-        this.measurementEndDate = this.jdcEndDate.getDate();
-        this.measurementEndDate = this.eraseTime(this.measurementEndDate);        
-        this.measurementEndDate.setTime( this.measurementEndDate.getTime() + (this.cbEndHour.getSelectedIndex() * 3600 * 1000));
+    private void refreshMeasurementDates() {
+        this.measurementStartDate = GUIUtils.buildDateTime(jdcStartDate, cbStartHour);        
+        this.measurementEndDate = GUIUtils.buildDateTime(jdcEndDate, cbEndHour);
+        System.out.println("start: " + measurementStartDate);
+        System.out.println("end: " + measurementEndDate);
     }
     
-    private Date eraseTime(Date date)
-    {
-        GregorianCalendar cal = new GregorianCalendar();
-        cal.setTimeInMillis( date.getTime());
-        cal.set( Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);        
-        return cal.getTime();
+    private void refresh() {
+        this.refreshMeasurementDates();
+        this.refreshMeasurement();
+        this.updateChart();
     }
     
-    private Date getCurrentDay(int offset)
-    {
-        int tmp = 0;
-        if( offset > 0)
-            tmp = offset;
-        
-        Date now = new Date();
-        GregorianCalendar cal = new GregorianCalendar();
-        cal.setTimeInMillis( now.getTime() + (tmp * 86400 * 1000) );
-        cal.set( Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);        
-        return cal.getTime();
-    }
-    
-    public void refreshMeasurement()
-    {
-        if( this.selectedSwitch != null)
-        {
-            Date d = new Date();
-            this.lblMeasureTime.setText( d.toString() );
+    public void refreshMeasurement() {
+        if( this.selectedSwitch != null) {
+            this.lblMeasureTime.setText(new Date().toString());
             this.portDataTableModel.clear();
             List<PortData> tmp = createPortData(this.selectedSwitch);
             this.portDataTableModel.addPortDataList( tmp );
@@ -177,19 +145,163 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         for (Port p : sw.getPorts()) {
             PortData element = new PortData();
             element.setPort(p);
-            Calendar start = Calendar.getInstance();
-            start.setTime(jdcStartDate.getDate());
-            start.add(Calendar.HOUR, 
-                    Integer.parseInt(cbStartHour.getSelectedItem().toString()));
-            Calendar end = Calendar.getInstance();
-            end.setTime(jdcEndDate.getDate());
-            end.add(Calendar.HOUR, 
-                    Integer.parseInt(cbEndHour.getSelectedItem().toString()));
             element.setMeasurementList(db.queryMeasurementsByPort(p, 
-                    start.getTime(), end.getTime()));
+                    measurementStartDate, measurementEndDate));
             data.add(element);
         }
         return data;
+    }
+    
+    //<editor-fold defaultstate="collapsed" desc="All functions for the showing the chart">
+    private JFreeChart createChart() {
+        this.createDataset();
+        JFreeChart chart = ChartFactory.createXYLineChart("PortData", "time", "mw"
+                , this.curDataSet, PlotOrientation.VERTICAL, true, true, false);
+        XYPlot plot = (XYPlot) chart.getPlot();
+
+        plot.setDomainPannable(true);
+        plot.setRangePannable(true);
+        final XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+        plot.setRenderer(renderer);
+        
+        plot.setRangeGridlinesVisible(true);
+        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+        return chart;
+    }
+    
+    private void createDataset()  {
+        final XYSeriesCollection dataset = new XYSeriesCollection();
+        List<XYSeries> tmp = this.createChartLines();
+        for(XYSeries line : tmp) {
+            dataset.addSeries(line);
+        }
+        this.curDataSet = dataset;
+    }
+    
+    private void updateChart() {
+        this.curDataSet.removeAllSeries();
+        List<XYSeries> tmp = this.createChartLines();
+        
+        for(XYSeries line : tmp) {
+            this.curDataSet.addSeries(line);
+        }
+     
+        this.curChartPanel.getChart().fireChartChanged();
+    }
+    
+    private List<XYSeries> createChartLines() {
+        List<XYSeries> lines = new LinkedList<>();
+        final XYSeries pwrMaxSeries = new XYSeries("PwrMax");
+        final XYSeries pwrConsumptionSeries = new XYSeries("PwrConsumption");
+        final XYSeries pwrMaxDrawnSeries = new XYSeries("PwrMaxDrawn");
+        final XYSeries pwrAllocatedSeries = new XYSeries("PwrAllocated");
+        final XYSeries pwrAvailableSeries = new XYSeries("PwrAvailable");
+
+        if( this.selectedPort != null ) {
+            int time = 0;
+            for(Measurement m : this.selectedPort.getMeasurementList() ) {
+                pwrMaxSeries.add(time, m.getCpeExtPsePortPwrMax());
+                pwrConsumptionSeries.add(time, m.getCpeExtPsePortPwrConsumption());
+                pwrMaxDrawnSeries.add(time, m.getCpeExtPsePortMaxPwrDrawn());
+                pwrAllocatedSeries.add(time, m.getCpeExtPsePortPwrAllocated());
+                pwrAvailableSeries.add(time, m.getCpeExtPsePortPwrAvailable());
+                time++;
+            }
+        }
+        
+        lines.add(pwrMaxSeries);
+        lines.add(pwrConsumptionSeries);
+        lines.add(pwrAllocatedSeries);
+        lines.add(pwrAvailableSeries);
+        lines.add(pwrMaxDrawnSeries);
+        return lines;
+    }
+    //</editor-fold>
+    
+    private void showContextMenu(MouseEvent e) {
+        JPopupMenu menu = new JPopupMenu();
+        final Point clickPoint = e.getPoint();
+        JMenuItem item = new JMenuItem("Delete Switch");
+        
+        item.addActionListener(new java.awt.event.ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = tblSwitch.rowAtPoint(clickPoint);
+                deleteSwitch(switchTableModel.getRow(row));
+            }
+	});
+	menu.add(item);
+	menu.show(tblSwitch, e.getX(), e.getY());
+    }
+    
+    private void deleteSwitch(Switch sw) {
+        String[] options = {"Ok", "Cancel"};
+		String question = "Delete switch " + sw.getIdentifier() + " ?";
+        int result = JOptionPane.showOptionDialog(this, question, "Confirm", JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                main.removeSwitch(sw);
+                db.deleteSwitch(sw);
+                reloadSwitches();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Failed to delete switch", 
+                        "Failure", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
+    private void addSwitch(Switch sw) {
+        try {
+            for (int i=0; i<sw.getPortCount(); i++) {
+                Port p = new Port(sw, i, null);
+                sw.addPort(p);
+            }
+            db.persistSwitch(sw);
+            main.addSwitch(sw);
+            reloadSwitches();
+        } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Failed to save switch", 
+                        "Failure", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    
+    /**
+     * @param args the command line arguments
+     */
+    public static void Main( final MeasurementBackend backend, final Main main)
+    {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : 
+                    javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException | InstantiationException 
+                | IllegalAccessException 
+                | javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(PoESNMPToolGUI.class.getName())
+                    .log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new PoESNMPToolGUI(backend, main).setVisible(true);
+            }
+        });
     }
 
     /**
@@ -434,28 +546,18 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExitActionPerformed
-        // TODO add your handling code here:
         System.exit(0);
     }//GEN-LAST:event_btnExitActionPerformed
-
-    private void refresh()
-    {
-        this.refreshMeasurementDates();
-        this.refreshMeasurement();
-        this.updateChart();
-    }
+    
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
-        // TODO add your handling code here:
         this.refresh();
     }//GEN-LAST:event_btnRefreshActionPerformed
 
     private void btnReloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReloadActionPerformed
-        // TODO add your handling code here:
         this.reloadSwitches();
     }//GEN-LAST:event_btnReloadActionPerformed
 
     private void btnRefresh2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefresh2ActionPerformed
-        // TODO add your handling code here:
         this.refresh();
     }//GEN-LAST:event_btnRefresh2ActionPerformed
 
@@ -466,169 +568,6 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
             addSwitch(sw);
         }
     }//GEN-LAST:event_btnAddActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void Main( final MeasurementBackend backend, final Main main)
-    {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(PoESNMPToolGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(PoESNMPToolGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(PoESNMPToolGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(PoESNMPToolGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new PoESNMPToolGUI(backend, main).setVisible(true);
-            }
-        });
-    }
-    
-    private void updateChart()
-    {
-        this.curDataSet.removeAllSeries();
-        List<XYSeries> tmp = this.createChartLines();
-        
-        for(XYSeries line : tmp)
-            this.curDataSet.addSeries(line);
-     
-        this.curChartPanel.getChart().fireChartChanged();
-    }
-    
-    private void initChart()
-    {
-        JFreeChart chart = createChart();
-        ChartPanel chartPanel = new ChartPanel(chart);
-        this.curChartPanel = new ChartPanel(chart);
-        this.pChart.add(curChartPanel);
-    }
-    
-    private List<XYSeries> createChartLines()
-    {
-        List<XYSeries> lines = new LinkedList<XYSeries>();
-        final XYSeries pwrMaxSeries = new XYSeries("PwrMax");
-        final XYSeries pwrConsumptionSeries = new XYSeries("PwrConsumption");
-        final XYSeries pwrMaxDrawnSeries = new XYSeries("PwrMaxDrawn");
-        final XYSeries pwrAllocatedSeries = new XYSeries("PwrAllocated");
-        final XYSeries pwrAvailableSeries = new XYSeries("PwrAvailable");
-
-        if( this.selectedPort != null )
-        {
-                int time = 0;
-                
-                for(Measurement m : this.selectedPort.getMeasurementList() )
-                {
-                    pwrMaxSeries.add(time, m.getCpeExtPsePortPwrMax());
-                    pwrConsumptionSeries.add(time, m.getCpeExtPsePortPwrConsumption());
-                    pwrMaxDrawnSeries.add(time, m.getCpeExtPsePortMaxPwrDrawn());
-                    pwrAllocatedSeries.add(time, m.getCpeExtPsePortPwrAllocated());
-                    pwrAvailableSeries.add(time, m.getCpeExtPsePortPwrAvailable());
-                    time++;
-                }
-        }
-        
-        lines.add(pwrMaxSeries);
-        lines.add(pwrConsumptionSeries);
-        lines.add(pwrAllocatedSeries);
-        lines.add(pwrAvailableSeries);
-        lines.add(pwrMaxDrawnSeries);
-        return lines;
-    }
-    
-    private void createDataset()
-    {
-        final XYSeriesCollection dataset = new XYSeriesCollection();
-        List<XYSeries> tmp = this.createChartLines();
-        
-        for(XYSeries line : tmp)
-            dataset.addSeries(line);
-
-        this.curDataSet = dataset;
-    }
-    
-    private JFreeChart createChart()
-    {
-        this.createDataset();
-        JFreeChart chart = ChartFactory.createXYLineChart("PortData", "time", "mw", this.curDataSet, PlotOrientation.VERTICAL, true, true, false);
-        XYPlot plot = (XYPlot) chart.getPlot();
-
-        plot.setDomainPannable(true);
-        plot.setRangePannable(true);
-        final XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
-        plot.setRenderer(renderer);
-        
-        plot.setRangeGridlinesVisible(true);
-        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-        rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
-        return chart;
-        
-    }
-    
-    private void showContextMenu(MouseEvent e) {
-        JPopupMenu menu = new JPopupMenu();
-		final Point clickPoint = e.getPoint();
-        JMenuItem item = new JMenuItem("Delete Switch");
-        
-        item.addActionListener(new java.awt.event.ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = tblSwitch.rowAtPoint(clickPoint);
-                deleteSwitch(switchTableModel.getRow(row));
-            }
-		});
-		menu.add(item);
-		menu.show(tblSwitch, e.getX(), e.getY());
-    }
-    
-    private void deleteSwitch(Switch sw) {
-        String[] options = {"Ok", "Cancel"};
-		String question = "Delete switch " + sw.getIdentifier() + " ?";
-        int result = JOptionPane.showOptionDialog(this, question, "Confirm", JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-        if (result == JOptionPane.OK_OPTION) {
-            try {
-                main.removeSwitch(sw);
-                db.deleteSwitch(sw);
-                reloadSwitches();
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Failed to delete switch", "Failure", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
-    
-    private void addSwitch(Switch sw) {
-        try {
-            for (int i=0; i<sw.getPortCount(); i++) {
-                Port p = new Port(sw, i, null);
-                sw.addPort(p);
-            }
-            db.persistSwitch(sw);
-            main.addSwitch(sw);
-            reloadSwitches();
-        } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Failed to save switch", "Failure", JOptionPane.ERROR_MESSAGE);
-            }
-    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
