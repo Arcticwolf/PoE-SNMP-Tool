@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -23,7 +24,7 @@ public class Switch implements Serializable {
     private String type;
     private int portCount;
     private String comment;
-    @OneToMany(mappedBy="sw", cascade=CascadeType.ALL)
+    @OneToMany(mappedBy="sw", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Port> ports;
     
     public Switch() {
