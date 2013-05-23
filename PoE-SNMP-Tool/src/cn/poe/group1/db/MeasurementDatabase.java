@@ -45,6 +45,11 @@ public class MeasurementDatabase implements MeasurementBackend {
     @Override
     public void deleteSwitch(Switch sw) {
         entityManager.getTransaction().begin();
+        for (Port p : sw.getPorts()) {
+            Query query = entityManager.createQuery("DELETE FROM Measurement m WHERE m.port = :port");
+            query.setParameter("port", p);
+            query.executeUpdate();
+        }
         entityManager.remove(sw);
         entityManager.getTransaction().commit();
     }

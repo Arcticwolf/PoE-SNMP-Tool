@@ -8,9 +8,8 @@ import cn.poe.group1.entity.Port;
 import cn.poe.group1.entity.Switch;
 import cn.poe.group1.gui.PoESNMPToolGUI;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import org.slf4j.Logger;
@@ -23,7 +22,7 @@ public class Main {
     private static final String FACTORY_NAME = "poe-snmp-tool";
     private static Logger log = LoggerFactory.getLogger(Main.class);
     private MeasurementBackend measurementBackend;
-    private List<SwitchDataCollector> collectors;
+    private HashMap<String, SwitchDataCollector> collectors;
     private Configuration config;
     private EntityManagerFactory factory;
 
@@ -33,7 +32,7 @@ public class Main {
     
     public Main() throws IOException {
         this.config = new PropertyFileConfig();
-        this.collectors = new ArrayList<>();
+        this.collectors = new HashMap<>();
         this.factory = Persistence.createEntityManagerFactory(FACTORY_NAME);
         this.measurementBackend = new MeasurementDatabase(this.factory.createEntityManager());
         
@@ -49,13 +48,13 @@ public class Main {
             measurementBackend.persistSwitch(sw);
         }
         
-        PoESNMPToolGUI.Main(measurementBackend);
+        PoESNMPToolGUI.Main(measurementBackend, this);
         
         // Load all switches from DB 
         List<Switch> switches = measurementBackend.retrieveAllSwitches();
         log.info("Loaded switches from db. Found: {}", switches.size());
         for (Switch s : switches) {
-            collectors.add(new SwitchDataCollector(s, config, new MeasurementDatabase(this.factory.createEntityManager())));
+            collectors.put(s.getIdentifier(), new SwitchDataCollector(s, config, new MeasurementDatabase(this.factory.createEntityManager())));
         }
         
         startCollecting();
@@ -64,28 +63,30 @@ public class Main {
     }
     
     public void startCollecting() {
-        for (SwitchDataCollector c : collectors) {
+        for (SwitchDataCollector c : collectors.values()) {
             c.startCollecting();
         }
         log.info("Start collecting measurements. Press Enter to quit.");
     }
     
     public void stopCollecting() {
-        for (SwitchDataCollector c : collectors) {
+        for (SwitchDataCollector c : collectors.values()) {
             c.stopCollecting();
         }
         log.info("Quit taking measurements.");
     }
     
-    public void addNewSwitch(String identifier, String ipAddress, String type, int portCount, String comment) {
-        Switch sw = new Switch(identifier, ipAddress, type, portCount, comment);
-        for (int i=0; i<portCount; i++) {
-            Port p = new Port(sw, i, null);
-            sw.addPort(p);
-        }
-        measurementBackend.persistSwitch(sw);
+    public void addSwitch(Switch sw) {
         SwitchDataCollector c = new SwitchDataCollector(sw, config,  new MeasurementDatabase(this.factory.createEntityManager()));
-        collectors.add(c);
+        collectors.put(sw.getIdentifier(), c);
         c.startCollecting();
+    }
+    
+    public void removeSwitch(Switch sw) {
+        SwitchDataCollector collector = collectors.get(sw.getIdentifier());
+        if (collector != null) {
+            collector.stopCollecting();
+        }
+        collectors.remove(sw.getIdentifier());
     }
 }

@@ -4,16 +4,24 @@
  */
 package cn.poe.group1.gui;
 
+import cn.poe.group1.Main;
 import cn.poe.group1.api.MeasurementBackend;
 import cn.poe.group1.entity.Measurement;
 import cn.poe.group1.entity.Port;
 import cn.poe.group1.entity.Switch;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.jfree.chart.ChartFactory;
@@ -39,6 +47,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     private MeasurementBackend db = null;
     private ChartPanel curChartPanel = null;
     private XYSeriesCollection curDataSet = null;
+    private Main main;
     
     private Date measurementStartDate = null;
     private Date measurementEndDate = null;
@@ -89,6 +98,15 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
             }
         });
         
+        this.tblSwitch.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+		        	showContextMenu(e);
+		        }
+			}
+        });
+        
         this.tblPorts.getSelectionModel().addListSelectionListener( new ListSelectionListener() {
 
             @Override
@@ -97,6 +115,15 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                 updateChart();
             }
         });
+    }
+    
+    public PoESNMPToolGUI(MeasurementBackend backend, Main main) {
+        this(backend);
+        this.main = main;
+    }
+    
+    public void setMain(Main main) {
+        this.main = main;
     }
 
     private void refreshMeasurementDates()
@@ -203,6 +230,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         btnExit = new javax.swing.JButton();
         btnRefresh = new javax.swing.JButton();
         btnReload = new javax.swing.JButton();
+        btnAdd = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(800, 600));
@@ -276,7 +304,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnRefresh2)
-                .addContainerGap(39, Short.MAX_VALUE))
+                .addContainerGap(189, Short.MAX_VALUE))
         );
         pMeasurementTimeLayout.setVerticalGroup(
             pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -285,7 +313,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                 .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jdcStartDate, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jdcStartDate, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
                         .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(cbStartHour)
                             .addComponent(jLabel3)
@@ -296,7 +324,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                             .addComponent(cbEndHour, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel5)
                             .addComponent(btnRefresh2))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
 
         pSwitchInfo.add(pMeasurementTime, java.awt.BorderLayout.CENTER);
@@ -389,6 +417,17 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         });
         jToolBar1.add(btnReload);
 
+        btnAdd.setText("Add Switch");
+        btnAdd.setFocusable(false);
+        btnAdd.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnAdd.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnAdd);
+
         getContentPane().add(jToolBar1, java.awt.BorderLayout.NORTH);
 
         pack();
@@ -420,10 +459,18 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         this.refresh();
     }//GEN-LAST:event_btnRefresh2ActionPerformed
 
+    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
+        SwitchDialog sd = new SwitchDialog(this, true);
+        Switch sw = sd.showDialog();
+        if (sw != null) {
+            addSwitch(sw);
+        }
+    }//GEN-LAST:event_btnAddActionPerformed
+
     /**
      * @param args the command line arguments
      */
-    public static void Main( final MeasurementBackend backend)
+    public static void Main( final MeasurementBackend backend, final Main main)
     {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -451,7 +498,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new PoESNMPToolGUI(backend).setVisible(true);
+                new PoESNMPToolGUI(backend, main).setVisible(true);
             }
         });
     }
@@ -536,8 +583,55 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         
     }
     
+    private void showContextMenu(MouseEvent e) {
+        JPopupMenu menu = new JPopupMenu();
+		final Point clickPoint = e.getPoint();
+        JMenuItem item = new JMenuItem("Delete Switch");
+        
+        item.addActionListener(new java.awt.event.ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = tblSwitch.rowAtPoint(clickPoint);
+                deleteSwitch(switchTableModel.getRow(row));
+            }
+		});
+		menu.add(item);
+		menu.show(tblSwitch, e.getX(), e.getY());
+    }
+    
+    private void deleteSwitch(Switch sw) {
+        String[] options = {"Ok", "Cancel"};
+		String question = "Delete switch " + sw.getIdentifier() + " ?";
+        int result = JOptionPane.showOptionDialog(this, question, "Confirm", JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                main.removeSwitch(sw);
+                db.deleteSwitch(sw);
+                reloadSwitches();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Failed to delete switch", "Failure", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
+    private void addSwitch(Switch sw) {
+        try {
+            for (int i=0; i<sw.getPortCount(); i++) {
+                Port p = new Port(sw, i, null);
+                sw.addPort(p);
+            }
+            db.persistSwitch(sw);
+            main.addSwitch(sw);
+            reloadSwitches();
+        } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Failed to save switch", "Failure", JOptionPane.ERROR_MESSAGE);
+            }
+    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnExit;
     private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnRefresh2;
