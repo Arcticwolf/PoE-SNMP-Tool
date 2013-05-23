@@ -150,8 +150,16 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         for (Port p : sw.getPorts()) {
             PortData element = new PortData();
             element.setPort(p);
+            Calendar start = Calendar.getInstance();
+            start.setTime(jdcStartDate.getDate());
+            start.add(Calendar.HOUR, 
+                    Integer.parseInt(cbStartHour.getSelectedItem().toString()));
+            Calendar end = Calendar.getInstance();
+            end.setTime(jdcEndDate.getDate());
+            end.add(Calendar.HOUR, 
+                    Integer.parseInt(cbEndHour.getSelectedItem().toString()));
             element.setMeasurementList(db.queryMeasurementsByPort(p, 
-                    jdcStartDate.getDate(), jdcEndDate.getDate()));
+                    start.getTime(), end.getTime()));
             data.add(element);
         }
         return data;
