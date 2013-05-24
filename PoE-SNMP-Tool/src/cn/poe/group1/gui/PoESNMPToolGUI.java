@@ -210,18 +210,41 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     private void showContextMenu(MouseEvent e) {
         JPopupMenu menu = new JPopupMenu();
         final Point clickPoint = e.getPoint();
-        JMenuItem item = new JMenuItem("Delete Switch");
+        JMenuItem itemDelete = new JMenuItem("Delete Switch");
         
-        item.addActionListener(new java.awt.event.ActionListener() {
+        itemDelete.addActionListener(new java.awt.event.ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 int row = tblSwitch.rowAtPoint(clickPoint);
                 deleteSwitch(switchTableModel.getRow(row));
             }
-	});
-	menu.add(item);
-	menu.show(tblSwitch, e.getX(), e.getY());
+        });
+        
+        JMenuItem itemEdit = new JMenuItem("Edit Switch");
+        itemEdit.addActionListener(new java.awt.event.ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = tblSwitch.rowAtPoint(clickPoint);
+                editSwitch(switchTableModel.getRow(row));
+            }
+            
+        });
+        
+        menu.add(itemEdit);
+        menu.add(itemDelete);
+        menu.show(tblSwitch, e.getX(), e.getY());
+    }
+    
+    private void editSwitch(Switch sw) {
+        SwitchDialog sd = new SwitchDialog(this, true, sw);
+        sw = sd.showDialog();
+        if (sw != null) {
+            collector.updateSwitch(sw);
+            db.mergeSwitch(sw);
+            reloadSwitches();
+        }
     }
     
     private void deleteSwitch(Switch sw) {

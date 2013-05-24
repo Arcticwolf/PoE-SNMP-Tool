@@ -42,6 +42,13 @@ public class MeasurementDatabase implements MeasurementBackend {
         entityManager.persist(sw);
         entityManager.getTransaction().commit();
     }
+    
+    @Override
+    public void mergeSwitch(Switch sw) {
+        entityManager.getTransaction().begin();
+        entityManager.merge(sw);
+        entityManager.getTransaction().commit();
+    }
 
     @Override
     public void deleteSwitch(Switch sw) {

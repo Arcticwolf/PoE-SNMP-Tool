@@ -43,6 +43,20 @@ public class DataCollectorImpl implements DataCollector {
         }
         collectors.remove(sw);
     }
+    
+    @Override
+    public void updateSwitch(Switch sw) {
+        SwitchDataCollector collector = collectors.get(sw);
+        if (collector != null) {
+            collector.stopCollecting();
+        }
+        SwitchDataCollector c = new SwitchDataCollector(sw, config,  
+                new MeasurementDatabase(this.factory.createEntityManager()));
+        collectors.put(sw, c);
+        int interval = config.getMeasurementInterval() / config.getDistributionSlots();
+        int factor = (collectors.size() - 1) % config.getDistributionSlots();
+        c.startCollecting(interval * factor);
+    }
 
     @Override
     public void shutdown() {

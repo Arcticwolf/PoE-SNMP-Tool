@@ -24,4 +24,11 @@ public interface DataCollector {
      * Shuts down the monitoring system.
      */
     void shutdown();
+    
+    /**
+     * Updates the existing switch, and starts monitoring with new information
+     * 
+     * @param sw the switch that should be updated.
+     */
+    void updateSwitch(Switch sw);
 }

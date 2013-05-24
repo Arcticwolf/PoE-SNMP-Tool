@@ -87,6 +87,14 @@ public class Switch implements Serializable {
         this.ports.add(port);
     }
     
+    public String getComment() {
+        return this.comment;
+    }
+    
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+    
     @Override
     public String toString() {
         return Objects.toStringHelper(Switch.class).add("identifier", identifier)

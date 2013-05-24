@@ -58,10 +58,16 @@ public interface MeasurementBackend {
     List<Measurement> queryMeasurementsByPort(Port port);
     
     /**
-     * Saves or updates a switch object to the measurement backend.
+     * Saves a switch object to the measurement backend.
      * @param sw The switch object that shall be persisted.
      */
     void persistSwitch(Switch sw);
+    
+    /**
+     * Merges an existing object to the measurement backend
+     * @param sw The switch object that shall be updated
+     */
+    void mergeSwitch(Switch sw);
 
     /**
      * Deletes a switch object from the measurement backend.
@@ -108,5 +114,12 @@ public interface MeasurementBackend {
      */
     List<Port> retrieveAllPorts(Switch sw);
     
+    /**
+     * Returns a list of portdata object according to the query parameters
+     * @param sw The switch object for which all portdata objects shall be loaded.
+     * @param startTime The start time of the period in which the portdata objects were measured
+     * @param endTime The end time of the period in which the portdata objects were measured
+     * @return A list of portdata objects that were found
+     */
     List<PortData> queryPortData(Switch sw, Date startTime, Date endTime);
 }

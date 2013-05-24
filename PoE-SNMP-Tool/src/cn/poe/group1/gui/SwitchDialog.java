@@ -18,6 +18,7 @@ import javax.swing.KeyStroke;
 public class SwitchDialog extends JDialog {
     
     private Switch sw;
+    private boolean updateMode = false;
 
     /**
      * A return status code - returned if Cancel button has been pressed
@@ -48,8 +49,20 @@ public class SwitchDialog extends JDialog {
         });
     }
     
+    public SwitchDialog(Frame parent, boolean modal, Switch sw) {
+        this(parent, modal);
+        this.sw = sw;
+        txtIdentifier.setEnabled(false);
+        txtIdentifier.setText(sw.getIdentifier());
+        txtIP.setText(sw.getIpAddress());
+        txtType.setText(sw.getType());
+        txtPorts.setEnabled(false);
+        txtPorts.setText(String.valueOf(sw.getPortCount()));
+        txtComment.setText(sw.getComment());
+        this.updateMode = true;
+    }
+    
     public Switch showDialog() {
-        sw = null;
         setVisible(true);
         return sw;
     }
@@ -179,7 +192,13 @@ public class SwitchDialog extends JDialog {
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
         try {
-            sw = new Switch(txtIdentifier.getText(), txtIP.getText(), txtType.getText(), Integer.parseInt(txtPorts.getText()), txtComment.getText());
+            if (updateMode) {
+                sw.setIpAddress(txtIP.getText());
+                sw.setType(txtType.getText());
+                sw.setComment(txtComment.getText());
+            } else {
+                sw = new Switch(txtIdentifier.getText(), txtIP.getText(), txtType.getText(), Integer.parseInt(txtPorts.getText()), txtComment.getText());
+            }
         } catch (NumberFormatException ex) {
             return;
         }
