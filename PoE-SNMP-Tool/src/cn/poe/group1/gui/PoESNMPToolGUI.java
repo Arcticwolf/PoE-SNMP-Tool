@@ -1,6 +1,5 @@
 package cn.poe.group1.gui;
 
-import cn.poe.group1.Main;
 import cn.poe.group1.api.DataCollector;
 import cn.poe.group1.api.MeasurementBackend;
 import cn.poe.group1.entity.Measurement;
@@ -88,6 +87,13 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         this.tblSwitch.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    showContextMenu(e);
+		}
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
                 if (e.isPopupTrigger()) {
                     showContextMenu(e);
 		}
@@ -419,7 +425,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                 .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(jdcEndDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(cbStartHour, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
+                    .addComponent(cbStartHour, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
                     .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel5)
                         .addComponent(btnRefresh2))
