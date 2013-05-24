@@ -1,6 +1,7 @@
 package cn.poe.group1.gui;
 
 import com.toedter.calendar.JDateChooser;
+import com.toedter.components.JSpinField;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -33,13 +34,16 @@ public class GUIUtils {
      * @param hour A JComboBox holding the hour.
      * @return The resulting Date object.
      */
-    public static Date buildDateTime(JDateChooser date, JComboBox hour) {
+    public static Date buildDateTime(JDateChooser date, JComboBox hour, JSpinField minute) {
         Calendar time = Calendar.getInstance();
         time.setTime(date.getDate());
         time.set(Calendar.HOUR_OF_DAY, 0);
         time.set(Calendar.MINUTE, 0);
+        time.set(Calendar.SECOND, 0);
         time.add(Calendar.HOUR, 
                     Integer.parseInt(hour.getSelectedItem().toString()));
+        time.add(Calendar.MINUTE,
+                minute.getValue());
         return time.getTime();
     }
 }

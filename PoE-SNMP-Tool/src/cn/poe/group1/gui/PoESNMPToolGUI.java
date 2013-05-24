@@ -68,6 +68,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         Calendar calendar = Calendar.getInstance();
         this.cbStartHour.setSelectedIndex(calendar.get(Calendar.HOUR_OF_DAY));
         this.cbEndHour.setSelectedIndex(calendar.get(Calendar.HOUR_OF_DAY));
+
         refreshMeasurementDates();
         
         JFreeChart chart = createChart();
@@ -112,8 +113,8 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     }
 
     private void refreshMeasurementDates() {
-        this.measurementStartDate = GUIUtils.buildDateTime(jdcStartDate, cbStartHour);        
-        this.measurementEndDate = GUIUtils.buildDateTime(jdcEndDate, cbEndHour);
+        this.measurementStartDate = GUIUtils.buildDateTime(jdcStartDate, cbStartHour, jpfStartMinute);        
+        this.measurementEndDate = GUIUtils.buildDateTime(jdcEndDate, cbEndHour, jpfEndMinute);
     }
     
     private void refresh() {
@@ -311,6 +312,8 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         cbEndHour = new javax.swing.JComboBox();
         jLabel5 = new javax.swing.JLabel();
         btnRefresh2 = new javax.swing.JButton();
+        jpfStartMinute = new com.toedter.components.JSpinField();
+        jpfEndMinute = new com.toedter.components.JSpinField();
         pRefreshTime = new javax.swing.JPanel();
         lblMeasureTime = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
@@ -374,6 +377,12 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
             }
         });
 
+        jpfStartMinute.setMaximum(59);
+        jpfStartMinute.setMinimum(0);
+
+        jpfEndMinute.setMaximum(59);
+        jpfEndMinute.setMinimum(0);
+
         javax.swing.GroupLayout pMeasurementTimeLayout = new javax.swing.GroupLayout(pMeasurementTime);
         pMeasurementTime.setLayout(pMeasurementTimeLayout);
         pMeasurementTimeLayout.setHorizontalGroup(
@@ -385,40 +394,48 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                 .addComponent(jdcStartDate, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(cbStartHour, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(4, 4, 4)
-                .addComponent(jLabel4)
-                .addGap(45, 45, 45)
-                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jpfStartMinute, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel4)
+                .addGap(38, 38, 38)
+                .addComponent(jLabel3)
+                .addGap(4, 4, 4)
                 .addComponent(jdcEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cbEndHour, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel5)
+                .addComponent(jpfEndMinute, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel5)
+                .addGap(38, 38, 38)
                 .addComponent(btnRefresh2)
-                .addContainerGap(46, Short.MAX_VALUE))
+                .addContainerGap())
         );
         pMeasurementTimeLayout.setVerticalGroup(
             pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pMeasurementTimeLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jdcStartDate, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(cbStartHour)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel4)))
-                    .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(jdcEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(cbEndHour, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel5)
-                            .addComponent(btnRefresh2))))
+                .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jdcEndDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cbStartHour, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
+                    .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel5)
+                        .addComponent(btnRefresh2))
+                    .addComponent(jLabel4)
+                    .addComponent(jpfStartMinute, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jdcStartDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(pMeasurementTimeLayout.createSequentialGroup()
+                        .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cbEndHour)
+                            .addComponent(jpfEndMinute, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(1, 1, 1)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        pMeasurementTimeLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btnRefresh2, cbEndHour, cbStartHour, jLabel2, jLabel3, jLabel4, jLabel5, jdcEndDate, jdcStartDate, jpfEndMinute, jpfStartMinute});
 
         pSwitchInfo.add(pMeasurementTime, java.awt.BorderLayout.CENTER);
 
@@ -570,6 +587,8 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     private javax.swing.JToolBar jToolBar1;
     private com.toedter.calendar.JDateChooser jdcEndDate;
     private com.toedter.calendar.JDateChooser jdcStartDate;
+    private com.toedter.components.JSpinField jpfEndMinute;
+    private com.toedter.components.JSpinField jpfStartMinute;
     private javax.swing.JSplitPane jspSwitchData;
     private javax.swing.JLabel lblMeasureTime;
     private javax.swing.JPanel pChart;
