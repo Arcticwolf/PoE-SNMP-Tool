@@ -40,8 +40,10 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     private Switch selectedSwitch = null;
     private PortData selectedPort = null;
     private MeasurementBackend db = null;
-    private ChartPanel curChartPanel = null;
-    private XYSeriesCollection curDataSet = null;
+    private ChartPanel portChartPanel = null;
+    private ChartPanel switchChartPanel = null;
+    private XYSeriesCollection switchDataSet = null;
+    private XYSeriesCollection portDataSet = null;
     private DataCollector collector;
     
     private Date measurementStartDate = null;
@@ -70,9 +72,13 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
 
         refreshMeasurementDates();
         
-        JFreeChart chart = createChart();
-        this.curChartPanel = new ChartPanel(chart);
-        this.pChart.add(curChartPanel);
+        JFreeChart chart = createPortChart();
+        this.portChartPanel = new ChartPanel(chart);
+        this.pChart.add(portChartPanel);
+        
+        JFreeChart switchChart = createSwitchChart();
+        this.switchChartPanel = new ChartPanel(switchChart);
+        this.pSwitchChart.add(switchChartPanel);
         
         this.tblSwitch.getSelectionModel().addListSelectionListener( new ListSelectionListener() {
 
@@ -81,6 +87,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                 selectedSwitch = switchTableModel.getRow(tblSwitch.getSelectedRow());
                 selectedPort = null;
                 refreshMeasurement();
+                updateSwitchChart();
             }
         });
         
@@ -105,7 +112,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 selectedPort = portDataTableModel.getRow( tblPorts.getSelectedRow());
-                updateChart();
+                updatePortChart();
             }
         });
     }
@@ -126,7 +133,8 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     private void refresh() {
         this.refreshMeasurementDates();
         this.refreshMeasurement();
-        this.updateChart();
+        this.updatePortChart();
+        this.updateSwitchChart();
     }
     
     public void refreshMeasurement() {
@@ -140,10 +148,10 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     }
     
     //<editor-fold defaultstate="collapsed" desc="All functions for the showing the chart">
-    private JFreeChart createChart() {
-        this.createDataset();
+    private JFreeChart createPortChart() {
+        this.createPortDataSet();
         JFreeChart chart = ChartFactory.createXYLineChart("PortData", "time", "mw"
-                , this.curDataSet, PlotOrientation.VERTICAL, true, true, false);
+                , this.portDataSet, PlotOrientation.VERTICAL, true, true, false);
         XYPlot plot = (XYPlot) chart.getPlot();
 
         plot.setDomainPannable(true);
@@ -157,27 +165,65 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         return chart;
     }
     
-    private void createDataset()  {
+    
+    private JFreeChart createSwitchChart() {
+        this.createSwitchDataSet();
+        JFreeChart chart = ChartFactory.createXYLineChart("SwitchData", "time", "mw"
+                , this.switchDataSet, PlotOrientation.VERTICAL, true, true, false);
+        XYPlot plot = (XYPlot) chart.getPlot();
+
+        plot.setDomainPannable(true);
+        plot.setRangePannable(true);
+        final XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+        plot.setRenderer(renderer);
+        
+        plot.setRangeGridlinesVisible(true);
+        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+        return chart;
+    }
+        
+    private void createPortDataSet()  {
         final XYSeriesCollection dataset = new XYSeriesCollection();
-        List<XYSeries> tmp = this.createChartLines();
+        List<XYSeries> tmp = this.createPortChartLines();
         for(XYSeries line : tmp) {
             dataset.addSeries(line);
         }
-        this.curDataSet = dataset;
+        this.portDataSet = dataset;
     }
     
-    private void updateChart() {
-        this.curDataSet.removeAllSeries();
-        List<XYSeries> tmp = this.createChartLines();
+    private void createSwitchDataSet()  {
+        final XYSeriesCollection dataset = new XYSeriesCollection();
+        List<XYSeries> tmp = this.createSwitchChartLines();
+        for(XYSeries line : tmp) {
+            dataset.addSeries(line);
+        }
+        this.switchDataSet = dataset;
+    }
+        
+    private void updatePortChart() {
+        this.portDataSet.removeAllSeries();
+        List<XYSeries> tmp = this.createPortChartLines();
         
         for(XYSeries line : tmp) {
-            this.curDataSet.addSeries(line);
+            this.portDataSet.addSeries(line);
         }
      
-        this.curChartPanel.getChart().fireChartChanged();
+        this.portChartPanel.getChart().fireChartChanged();
     }
     
-    private List<XYSeries> createChartLines() {
+    private void updateSwitchChart() {
+        this.switchDataSet.removeAllSeries();
+        List<XYSeries> tmp = this.createSwitchChartLines();
+        
+        for(XYSeries line : tmp) {
+            this.switchDataSet.addSeries(line);
+        }
+     
+        this.switchChartPanel.getChart().fireChartChanged();
+    }
+    
+    private List<XYSeries> createPortChartLines() {
         List<XYSeries> lines = new LinkedList<>();
         final XYSeries pwrMaxSeries = new XYSeries("PwrMax");
         final XYSeries pwrConsumptionSeries = new XYSeries("PwrConsumption");
@@ -205,6 +251,39 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         lines.add(pwrMaxDrawnSeries);
         return lines;
     }
+    
+    private List<XYSeries> createSwitchChartLines() {
+        try
+        {
+            List<XYSeries> lines = new LinkedList<>();
+            final XYSeries pwrConsumptionSeries = new XYSeries("PwrConsumption");
+            
+            if( this.selectedSwitch != null ) {
+                int time = 0;
+                int tmpPwrConsumption = 0;
+                List<Port> portList = db.retrieveAllPorts(selectedSwitch);
+                
+                for( Port p : portList)
+                {
+                    tmpPwrConsumption = 0;
+                    for(Measurement m : db.queryMeasurementsByPort(p,
+                            measurementStartDate, measurementEndDate) )
+                    {
+                        tmpPwrConsumption += m.getCpeExtPsePortPwrConsumption();                        
+                    }
+                    pwrConsumptionSeries.add(time, tmpPwrConsumption);                    
+                    time++;
+                }
+            }
+            
+            lines.add(pwrConsumptionSeries);
+            return lines;
+        }
+        catch(Exception e)
+        {
+            return new LinkedList<>();
+        }
+    }  
     //</editor-fold>
     
     private void showContextMenu(MouseEvent e) {
@@ -329,7 +408,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         pSideBar = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblSwitch = new javax.swing.JTable();
-        pData = new javax.swing.JPanel();
+        pCenter = new javax.swing.JPanel();
         pSwitchInfo = new javax.swing.JPanel();
         pMeasurementTime = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -346,11 +425,17 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         pRefreshTime = new javax.swing.JPanel();
         lblMeasureTime = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        pSwitchData = new javax.swing.JPanel();
-        jspSwitchData = new javax.swing.JSplitPane();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        pData = new javax.swing.JPanel();
+        pPortsData = new javax.swing.JPanel();
+        jspPortData = new javax.swing.JSplitPane();
         pChart = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tblPorts = new javax.swing.JTable();
+        pSwitchData = new javax.swing.JPanel();
+        jspSwitchData = new javax.swing.JSplitPane();
+        jPanel1 = new javax.swing.JPanel();
+        pSwitchChart = new javax.swing.JPanel();
         jToolBar1 = new javax.swing.JToolBar();
         btnExit = new javax.swing.JButton();
         btnRefresh = new javax.swing.JButton();
@@ -373,7 +458,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
 
         pMain.add(pSideBar, java.awt.BorderLayout.WEST);
 
-        pData.setLayout(new java.awt.BorderLayout());
+        pCenter.setLayout(new java.awt.BorderLayout());
 
         pSwitchInfo.setMinimumSize(new java.awt.Dimension(100, 80));
         pSwitchInfo.setName(""); // NOI18N
@@ -491,17 +576,19 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
 
         pSwitchInfo.add(pRefreshTime, java.awt.BorderLayout.PAGE_START);
 
-        pData.add(pSwitchInfo, java.awt.BorderLayout.NORTH);
+        pCenter.add(pSwitchInfo, java.awt.BorderLayout.NORTH);
 
-        pSwitchData.setLayout(new java.awt.BorderLayout());
+        pData.setLayout(new java.awt.BorderLayout());
 
-        jspSwitchData.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
-        jspSwitchData.setMinimumSize(new java.awt.Dimension(23, 600));
+        pPortsData.setLayout(new java.awt.BorderLayout());
+
+        jspPortData.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jspPortData.setMinimumSize(new java.awt.Dimension(23, 600));
 
         pChart.setMinimumSize(new java.awt.Dimension(0, 300));
         pChart.setPreferredSize(new java.awt.Dimension(0, 300));
         pChart.setLayout(new java.awt.BorderLayout());
-        jspSwitchData.setBottomComponent(pChart);
+        jspPortData.setBottomComponent(pChart);
 
         jScrollPane2.setMinimumSize(new java.awt.Dimension(23, 300));
         jScrollPane2.setPreferredSize(new java.awt.Dimension(453, 300));
@@ -509,13 +596,44 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         tblPorts.setModel(this.portDataTableModel);
         jScrollPane2.setViewportView(tblPorts);
 
-        jspSwitchData.setTopComponent(jScrollPane2);
+        jspPortData.setTopComponent(jScrollPane2);
+
+        pPortsData.add(jspPortData, java.awt.BorderLayout.CENTER);
+
+        pData.add(pPortsData, java.awt.BorderLayout.CENTER);
+
+        jTabbedPane1.addTab("Ports", pData);
+
+        pSwitchData.setLayout(new java.awt.BorderLayout());
+
+        jspSwitchData.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
+        jPanel1.setMinimumSize(new java.awt.Dimension(100, 250));
+        jPanel1.setPreferredSize(new java.awt.Dimension(983, 250));
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 983, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 250, Short.MAX_VALUE)
+        );
+
+        jspSwitchData.setTopComponent(jPanel1);
+
+        pSwitchChart.setLayout(new java.awt.BorderLayout());
+        jspSwitchData.setBottomComponent(pSwitchChart);
 
         pSwitchData.add(jspSwitchData, java.awt.BorderLayout.CENTER);
 
-        pData.add(pSwitchData, java.awt.BorderLayout.CENTER);
+        jTabbedPane1.addTab("Switch", pSwitchData);
 
-        pMain.add(pData, java.awt.BorderLayout.CENTER);
+        pCenter.add(jTabbedPane1, java.awt.BorderLayout.CENTER);
+
+        pMain.add(pCenter, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(pMain, java.awt.BorderLayout.CENTER);
 
@@ -611,21 +729,27 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JToolBar jToolBar1;
     private com.toedter.calendar.JDateChooser jdcEndDate;
     private com.toedter.calendar.JDateChooser jdcStartDate;
     private com.toedter.components.JSpinField jpfEndMinute;
     private com.toedter.components.JSpinField jpfStartMinute;
+    private javax.swing.JSplitPane jspPortData;
     private javax.swing.JSplitPane jspSwitchData;
     private javax.swing.JLabel lblMeasureTime;
+    private javax.swing.JPanel pCenter;
     private javax.swing.JPanel pChart;
     private javax.swing.JPanel pData;
     private javax.swing.JPanel pMain;
     private javax.swing.JPanel pMeasurementTime;
+    private javax.swing.JPanel pPortsData;
     private javax.swing.JPanel pRefreshTime;
     private javax.swing.JPanel pSideBar;
+    private javax.swing.JPanel pSwitchChart;
     private javax.swing.JPanel pSwitchData;
     private javax.swing.JPanel pSwitchInfo;
     private javax.swing.JTable tblPorts;
