@@ -10,6 +10,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -262,16 +263,31 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                 int time = 0;
                 int tmpPwrConsumption = 0;
                 List<Port> portList = db.retrieveAllPorts(selectedSwitch);
+                List<Integer> sumPwrConsumption = new ArrayList<Integer>();
                 
+                // go through all ports
                 for( Port p : portList)
                 {
-                    tmpPwrConsumption = 0;
+                    time = 0;
+                    // go through all measurements at a current time of a port
                     for(Measurement m : db.queryMeasurementsByPort(p,
                             measurementStartDate, measurementEndDate) )
                     {
-                        tmpPwrConsumption += m.getCpeExtPsePortPwrConsumption();                        
+                        // at the start we dont know how many measurements we have so sumPwrConsumption grows iterativly in size
+                        if( sumPwrConsumption.size() <= time)
+                            sumPwrConsumption.add(0);
+                        
+                        // add measurement of port at current time to sumList
+                        sumPwrConsumption.set(time, sumPwrConsumption.get(time) + m.getCpeExtPsePortPwrConsumption());
+                        time++;
                     }
-                    pwrConsumptionSeries.add(time, tmpPwrConsumption);                    
+                }
+                
+                // now insert data (time, sumPwrConsumption) into line
+                time = 0;
+                for( Integer i : sumPwrConsumption)
+                {
+                    pwrConsumptionSeries.add(time, i);
                     time++;
                 }
             }
