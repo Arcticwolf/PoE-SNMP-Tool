@@ -258,12 +258,20 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         {
             List<XYSeries> lines = new LinkedList<>();
             final XYSeries pwrConsumptionSeries = new XYSeries("PwrConsumption");
+            final XYSeries pwrMaxSeries = new XYSeries("PwrMax");
+            final XYSeries pwrMaxDrawnSeries = new XYSeries("PwrMaxDrawn");
+            final XYSeries pwrAllocatedSeries = new XYSeries("PwrAllocated");
+            final XYSeries pwrAvailableSeries = new XYSeries("PwrAvailable");
             
             if( this.selectedSwitch != null ) {
                 int time = 0;
                 int tmpPwrConsumption = 0;
                 List<Port> portList = db.retrieveAllPorts(selectedSwitch);
                 List<Integer> sumPwrConsumption = new ArrayList<Integer>();
+                List<Integer> sumPwrMax = new ArrayList<Integer>();
+                List<Integer> sumPwrDrawn = new ArrayList<Integer>();
+                List<Integer> sumPwrAllocated = new ArrayList<Integer>();
+                List<Integer> sumPwrAvailabe = new ArrayList<Integer>();
                 
                 // go through all ports
                 for( Port p : portList)
@@ -275,24 +283,43 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                     {
                         // at the start we dont know how many measurements we have so sumPwrConsumption grows iterativly in size
                         if( sumPwrConsumption.size() <= time)
+                        {
                             sumPwrConsumption.add(0);
+                            sumPwrMax.add(0);
+                            sumPwrDrawn.add(0);
+                            sumPwrAllocated.add(0);
+                            sumPwrAvailabe.add(0);                            
+                        }
                         
                         // add measurement of port at current time to sumList
                         sumPwrConsumption.set(time, sumPwrConsumption.get(time) + m.getCpeExtPsePortPwrConsumption());
+                        sumPwrMax.set(time, sumPwrMax.get(time) + m.getCpeExtPsePortPwrMax());
+                        sumPwrDrawn.set(time, sumPwrDrawn.get(time) + m.getCpeExtPsePortMaxPwrDrawn());
+                        sumPwrAllocated.set(time, sumPwrAllocated.get(time) + m.getCpeExtPsePortPwrAllocated());
+                        sumPwrAvailabe.set(time, sumPwrAvailabe.get(time) + m.getCpeExtPsePortPwrAvailable());
                         time++;
                     }
                 }
                 
                 // now insert data (time, sumPwrConsumption) into line
                 time = 0;
-                for( Integer i : sumPwrConsumption)
+                for( int i = 0; i < sumPwrConsumption.size(); i++)
                 {
-                    pwrConsumptionSeries.add(time, i);
+                    pwrConsumptionSeries.add(time, sumPwrConsumption.get(i));
+                    pwrMaxSeries.add(time, sumPwrMax.get(i));
+                    pwrMaxDrawnSeries.add(time, sumPwrDrawn.get(i));
+                    pwrAvailableSeries.add(time, sumPwrAvailabe.get(i));
+                    pwrAllocatedSeries.add(time, sumPwrAllocated.get(i));
+
                     time++;
                 }
             }
             
+            lines.add(pwrMaxSeries);            
             lines.add(pwrConsumptionSeries);
+            lines.add(pwrAllocatedSeries);
+            lines.add(pwrAvailableSeries);
+            lines.add(pwrMaxDrawnSeries);
             return lines;
         }
         catch(Exception e)
