@@ -10,11 +10,13 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -69,7 +71,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         this.jdcEndDate.setDate(GUIUtils.getCurrentDay(1));
         Calendar calendar = Calendar.getInstance();
         this.cbStartHour.setSelectedIndex(calendar.get(Calendar.HOUR_OF_DAY));
-        this.cbEndHour.setSelectedIndex(calendar.get(Calendar.HOUR_OF_DAY));
+        this.cbEndHour.setSelectedIndex(calendar.get(Calendar.HOUR_OF_DAY) + 1);
 
         refreshMeasurementDates();
         
@@ -145,6 +147,24 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
             List<PortData> tmp = db.queryPortData(selectedSwitch, 
                     measurementStartDate, measurementEndDate);
             this.portDataTableModel.addPortDataList( tmp );
+        }
+    }
+    
+    private void exportMeasurement() {
+        try {
+            List<Measurement> measurements = db.queryMeasurementsBySwitch
+                    (selectedSwitch, measurementStartDate, measurementEndDate);
+            final JFileChooser fc = new JFileChooser();
+            fc.setDialogTitle("Select file for CSV export");
+            fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fc.setMultiSelectionEnabled(false);
+            int returnVal = fc.showSaveDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                collector.exportMeasurements(measurements, fc.getSelectedFile().getAbsolutePath());
+            }
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Failed to export measurements.", 
+                        "Failure", JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -267,11 +287,12 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                 int time = 0;
                 int tmpPwrConsumption = 0;
                 List<Port> portList = db.retrieveAllPorts(selectedSwitch);
-                List<Integer> sumPwrConsumption = new ArrayList<Integer>();
-                List<Integer> sumPwrMax = new ArrayList<Integer>();
-                List<Integer> sumPwrDrawn = new ArrayList<Integer>();
-                List<Integer> sumPwrAllocated = new ArrayList<Integer>();
-                List<Integer> sumPwrAvailabe = new ArrayList<Integer>();
+                List<Integer> sumPwrConsumption = new ArrayList<>();
+                List<Integer> sumPwrMax = new ArrayList<>();
+                List<Integer> sumPwrDrawn = new ArrayList<>();
+                List<Integer> sumPwrAllocated = new ArrayList<>();
+                List<Integer> sumPwrAvailabe = new ArrayList<>();
+
                 
                 // go through all ports
                 for( Port p : portList)
@@ -282,8 +303,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                             measurementStartDate, measurementEndDate) )
                     {
                         // at the start we dont know how many measurements we have so sumPwrConsumption grows iterativly in size
-                        if( sumPwrConsumption.size() <= time)
-                        {
+                        if( sumPwrConsumption.size() <= time) {
                             sumPwrConsumption.add(0);
                             sumPwrMax.add(0);
                             sumPwrDrawn.add(0);
@@ -465,6 +485,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         btnRefresh2 = new javax.swing.JButton();
         jpfStartMinute = new com.toedter.components.JSpinField();
         jpfEndMinute = new com.toedter.components.JSpinField();
+        btnExport = new javax.swing.JButton();
         pRefreshTime = new javax.swing.JPanel();
         lblMeasureTime = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
@@ -540,6 +561,13 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         jpfEndMinute.setMaximum(59);
         jpfEndMinute.setMinimum(0);
 
+        btnExport.setText("Export");
+        btnExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pMeasurementTimeLayout = new javax.swing.GroupLayout(pMeasurementTime);
         pMeasurementTime.setLayout(pMeasurementTimeLayout);
         pMeasurementTimeLayout.setHorizontalGroup(
@@ -565,9 +593,11 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                 .addComponent(jpfEndMinute, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel5)
-                .addGap(38, 38, 38)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnRefresh2)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnExport)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pMeasurementTimeLayout.setVerticalGroup(
             pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -579,7 +609,8 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                     .addComponent(cbStartHour, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
                     .addGroup(pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel5)
-                        .addComponent(btnRefresh2))
+                        .addComponent(btnRefresh2)
+                        .addComponent(btnExport))
                     .addComponent(jLabel4)
                     .addComponent(jpfStartMinute, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jdcStartDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -658,7 +689,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 983, Short.MAX_VALUE)
+            .addGap(0, 1024, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -757,10 +788,15 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
             addSwitch(sw);
         }
     }//GEN-LAST:event_btnAddActionPerformed
+
+    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
+        this.exportMeasurement();
+    }//GEN-LAST:event_btnExportActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnExit;
+    private javax.swing.JButton btnExport;
     private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnRefresh2;
     private javax.swing.JButton btnReload;
