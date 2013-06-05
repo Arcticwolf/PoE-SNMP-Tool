@@ -265,11 +265,11 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
             }
         }
         
-        lines.add(pwrMaxSeries);
         lines.add(pwrConsumptionSeries);
         lines.add(pwrAllocatedSeries);
         lines.add(pwrAvailableSeries);
         lines.add(pwrMaxDrawnSeries);
+        lines.add(pwrMaxSeries);        
         return lines;
     }
     
@@ -335,11 +335,11 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                 }
             }
             
-            lines.add(pwrMaxSeries);            
             lines.add(pwrConsumptionSeries);
             lines.add(pwrAllocatedSeries);
             lines.add(pwrAvailableSeries);
             lines.add(pwrMaxDrawnSeries);
+            //lines.add(pwrMaxSeries);                        
             return lines;
         }
         catch(Exception e)

@@ -12,8 +12,7 @@ import javax.swing.table.AbstractTableModel;
 public class PortDataTableModel extends AbstractTableModel 
 {
     
-    private String[] columnNames = { "Port", "PwrMax", "PwrMaxDrawn", 
-        "PwrAllocated", "PwrAvailable" , "PwrConsumption"};
+    private String[] columnNames = { "Port", "PwrMax", "PwrAvailable", "PwrAllocated", "PwrMaxDrawn",  "PwrConsumption"};
     private List<PortData> data;
        
     public PortDataTableModel()
@@ -76,11 +75,11 @@ public class PortDataTableModel extends AbstractTableModel
             case 1:
                 return data.get(row).getAvgCpeExtPsePortPwrMax();
             case 2:
-                return data.get(row).getAvgCpeExtPsePortMaxPwrDrawn();
+                return data.get(row).getAvgCpeExtPsePortPwrAvailable();
             case 3:
                 return data.get(row).getAvgCpeExtPsePortPwrAllocated();
             case 4:
-                return data.get(row).getAvgCpeExtPsePortPwrAvailable();
+                return data.get(row).getAvgCpeExtPsePortMaxPwrDrawn();
             case 5:
                 return data.get(row).getAvgCpeExtPsePortPwrConsumption();
                                   
