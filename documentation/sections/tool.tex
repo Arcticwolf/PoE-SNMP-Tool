@@ -1,114 +1,85 @@
 \section{PoE SNMP Monitoring Tool}
 \label{sec:tool}
+Diese Sektion beschreibt das durch das Projektteam entwickelte Tool welches für das PoE Monitoring verwendet wird.
+Hierfür wird neben der Beschreibung der Oberfläche auch Details über den Aufbau des Tools illustriert.
 
 \subsection{Architektur}
 
-Das PoE-Tool besteht aus 2 Komponenten.
-
-\begin{description}
-  \item [\textbf{Backend}] Die Backend-Komponente erzeugt kontinuierlich
-  Messungen für alle definierten Switches durch. Die Zeitintervalle zwischen den Messungen
-  werden mittels config-file angegeben. Die Messungen werden weiters in der
-  Datenbank abgelegt. Zusätzlich bietet das Backend eine Schnittstelle an welche
-  es erlaubt Abfragen auf die gesammelten Measurements zu machen.
-  \item [\textbf{GUI}] Die GUI-Komponente nimmt Benutzeranfragen entgegen und
-  fragt die darzustellenden Daten vom Backend ab. Das Backend liefert jedoch nur
-  Messungen. Die Gruppierung und Konvertierung der Daten in ein übersichtliches
-  von Menschen verwertbares Datenmaterial wird ebenfalls von der GUI
-  durchgeführt.  
-\end{description}
-
+Das PoE-Tool besteht grundsätzlich aus drei Komponenten (beziehungsweise vier wenn man die Datenbank mit zählt), welche in Abbildung \ref{fig:architecture} dargestellt werden. 
 
 \begin{figure}[h]
     \centering
     \leavevmode
-    \includegraphics[width=1.0\linewidth]{figures/architecture.jpeg}
-    \caption{Software-Architektur PoE}
-    \label{fig:Software-Architektue PoE}
+    \includegraphics[width=1.0\linewidth]{figures/architecture_new}
+    \caption{Software-Architektur PoE SNMP Monitoring Tool}
+    \label{fig:architecture}
 \end{figure}
+
+Die Funktionen der einzelnen Komponenten ist wie folgt eingeteilt:
+
+\begin{description}
+  \item[Measurement Backend:] Diese Komponente bildet die Schnittstelle des Systems zu der Datenbank welche für die Speicherung der Nutzdaten des Tools verwendet wird. Diese Komponente bietet Funktionen zum Anlegen, Speichern und Löschen von Switches, Speichern von Messungen und dem Abfragen dieser durch verschiedenste Kriterien.
+  \item[Data Collector:] Diese Komponente ist für die kontinuierliche Abfrage (die Intervalle werden im Config-File angegeben) von Messungen für alle aktiven Switches verantwortlich. Während jeder Messung wird der aktuelle PoE Status jedes Ports pro Switch ausgelesen. Nachdem die Werte aller Ports eines Switches ausgelesen wurden, werden die entsprechenden Messungen an das \textbf{Measurement Backend} zum Speichern eben dieser gesendet.
+  \item [GUI] Die GUI-Komponente nimmt Benutzeranfragen entgegen und fragt die darzustellenden Daten vom \textbf{Measurement Backend} ab. Das \textbf{Measurement Backend} liefert die entsprechenden Daten die dann in ein übersichtliches, von Menschen verwertbares, Datenmaterial konvertiert und angezeigt werden.
+\end{description}
 
 \subsection{Konfiguration}
 
-Das PoE-Tool wird über die Konfigurationsdatei
-\textbf{config.properties} angepasst. Diese enthält folgende Optionen:
+Das PoE-Tool wird über die Konfigurationsdatei \textbf{config.properties} angepasst. Diese enthält folgende Optionen:
 
 \begin{description}
-  \item [\textbf{measurement.interval}] Dieser Wert gibt die Zeit die zwischen
-  Messungen verstreicht in ms an.
-  \item [\textbf{distribution.slots}] Dieser Wert gibt in wieviele Zeitslots ein
-  Messintervall unterteilt werden soll, um eine gleichmäßigere Verteilung an
-  SNMP-Anfragen an die einzelnen Switches zu ermöglichen.
-  \item [\textbf{data.retriever.impl}] Dieser Wert gibt an welche Datenquelle
-  für die GUI verwendet werden soll. Es gibt 2 Datenquellen. Einerseits eine
-  Test-Datenquelle für die GUI
-  \textit{cn.poe.group1.collector.DummyDataRetriever} und zusätzlich die
-  Datenquelle welche die tatsächlichen Nutzdaten liefert \textit{cn.poe.group1.collector.DataRetrieve}
+  \item [measurement.interval] Dieser Wert gibt die Zeit in Millisekunden an, die zwischen zwei Messungen des selben Switches vergehen sollen. Dieser Wert muss je nach Struktur des Netzwerks gewählt werden, da hier auch die Zeit die der Switch zum Antworten auf SNMP Anfragen braucht eingerechnet werden muss. Ein zu kleiner Wert raubt den Messungen die Aussagekraft.
+  \item [distribution.slots] Basierend auf diesem Wert, wird das Zeitintervall, welches in \textbf{measurement.interval} definiert ist, in x Zeitslots eingeteilt. Diese Einstellung wurde eingeführt, damit nicht alle Switches immer zur gleichen Zeit befragt werden und statt dessen eine bessere Verteilung der Anfragen gewährleistet wird. Zum Beispiel: Intervall ist auf 1000 ms und Slots auf 10 eingestellt. Daraufhin wird das Intervall in 10 Slots aufgeteilt, die 100 ms von einander entfernt sind.
+  \item [\textbf{data.retriever.impl}] Dieser Wert gibt an welche Implementierung der SNMPDataRetriever, welcher verwendet wird um eine Messung via SNMP durchzuführen. Derzeit gibt es zwei Implementierungen dieses Interfaces:
+  \begin{description}
+   \item[cn.poe.group1.collector.DummyDataRetriever:] Ist eine Testimplementierung welche das Laden von SMNP Werten nur simuliert und Testwerte zurück gibt. Wurde für die Erstellung des Prototyps verwendet.
+   \item[cn.poe.group1.collector.DataRetriever:] Ist die reale Implementierung welcher wirklich SMNP Werte von Geräten abfragt.
+  \end{description}
 \end{description}
 
 \subsection{Verwendung}
+Beim Start des PoE-Tool wird die Datenbank auf existierende Switch Definitionen überprüft. Für jede existierende Definition, wird automatisch mit den Messungen für den entsprechenden Switch begonnen. Danach wird das GUI des Tools gestartet, welche alle existierenden Definitionen in der linken Tabelle anzeigt. Wird ein Switch dort ausgewählt, werden seine Nutzdaten im rechten Feld angezeigt.
 
-Durch das Starten des PoE-Tool beginnt dieses automatisch Messungen für alle
-definierten Switches zu erzeugen. Durch Auswahl eines entsprechendes Switches in
-der linken Tabelle  können für diesen die Nutzdaten angezeigt werden.
-
-Wichtig ist hier die GUI zeigt immer die Messdaten aus einem bestimmten Zeitraum
-an. Dieser kann im PoE-Hauptfenster rechts oben definiert werden. Um die Daten
-zu aktualisieren klickt man einfach auf \textbf{Reload}.
+Wichtig: Die GUI zeigt immer nur die Messdaten aus einem bestimmten Zeitraum an. Dieser kann im Hauptfenster rechts oben definiert werden. Um die Nutzdaten zu aktualisieren, mus der \textbf{Reload} Button betätigt werden.
 
 \subsubsection{Switch}
-
-Durch Auswahl eines Switches in der linken Tabelle erhält man einen Überblick
-über den Switch. Auf der Registerkarte Switch im rechten Teil des Fensters
-erhält man einen Überblick den zeitlichen Verlauf der Messungen am Switch.
+Durch die Auswahl eines Switches in der linken Tabelle, werden die entsprechenden Nutzdaten geladen. Hierbei sind die Nutzdaten kategorisch auf zwei Registerkarten aufgeteilt:
+\begin{description}
+ \item[Ports:] Die Werte in dieser Registerkarte listen die Durchschnittszahlen für die PoE Werte der Ports des gewählten Switches auf. Auf diese Weise kann ein schneller Überblick über alle Ports gewährleistet werden. Dieser Reiter wird immer beim Öffnen eines Switches als Standard angezeigt. Details über die Ports werden in Punkt \ref{sub:ports} genauer erläutert.
+ \item[Switch:] Dieser Reiter bietet eine Übersicht über die kumulierten Werte der Ports des gewählten Switches in Form einer Kurve. Somit bietet diese Sicht einen guten Überblick über den PoE Werteverlauf des gesamten Switches und erlaubt eine schnelle Überprüfung der Kapazitätsgrenzen des Switches (siehe Abbildung \ref{fig:overview-switch}).
+\end{description}
 
 \begin{figure}[h]
     \centering
     \leavevmode
-    \includegraphics[width=1.0\linewidth]{figures/screenshot2.jpg}
-    \caption{Screenshot der Software}
-    \label{fig:PoE-Screenshot}
+    \includegraphics[width=1.0\linewidth]{figures/screenshot2}
+    \caption{Übersicht über einen Switch}
+    \label{fig:overview-switch}
 \end{figure}
 
-Durch einen Klick auf \textbf{Add Switch} in der Menüzeile kann man einen neuen
-Switch definieren welcher überwacht werden soll. Dazu müssen lediglich die Daten
-im Popup ausgefüllt und bestätigt werden. 
+Um einen neuen Switch, welcher überwacht werden soll, zu dem Tool hinzuzufügen, gibt es den Menüpunkt \textbf{Add Switch} in der Menüleiste des Tools. Durch aktivieren dieses Menüpunktes, wird ein Popup geöffnet (siehe Abbildung \ref{fig:popup}) welches ausgefüllt und bestätigt werden muss. Nach dem Anlegen eines neuen Switches, beginnen die Messungen automatisch im Hintergrund.
 
  \begin{figure}[h]
     \centering
     \leavevmode
     \includegraphics[scale=0.5]{figures/screenshot3.jpg}
     \caption{Popup um neuen Switch anzulegen}
-    \label{fig:NeuerSwitch-PoE}
+    \label{fig:popup}
 \end{figure}
 
-Zur Editierung und Löschung von Switches macht man einfach einen Rechtsklick auf
-den entsprechenden Switch in der linken Tabelle. Danach taucht ein Kontextmenü
-auf welches 2 Einträge hat \textbf{Edit Switch} (Editieren von Switches) und
-\textbf{Delete Switch} (Löschen von Switches).
+Um Switches editieren beziehungsweise löschen zu können, wurden diese Funktionen in das Kontextmenü der linken Tabelle hinzugefügt. Das Kontextmenü enthält einen Punkt zur Änderung des Switches (\textbf{Edit Switch}) und ein Punkt für das Löschen von Switches (\textbf{Delete Switch}).
 
 \subsubsection{Ports}
-
-Auf der Registerkarte Port im rechten Teil des Fensters können die Daten über
-die einzelnen Ports eines Switchs betrachtet werden. Die Tabelle enthält dabei
-einen Mittwert aus den Messungen über die einzelnen Parameter. Der Chart enthält
-einen graphischen Verlauf der einzelnen Parametern.
+\label{sub:ports}
+Auf der Registerkarte Port im rechten Teil des Fensters können die Daten über die einzelnen Ports eines Switches betrachtet werden. Die Tabelle enthält dabei einen Mittelwert aus den Messungen über die einzelnen Parameter für den gegebenen Zeitraum. Der Chart enthält einen graphischen Verlauf der einzelnen Parametern. Abbildung \ref{fig:overview-port} zeigt wie die Port Übersicht im Tool aussieht.
 
 \begin{figure}[h]
     \centering
     \leavevmode
-    \includegraphics[width=1.0\linewidth]{figures/screenshot1.png}
-    \caption{Ports PoE}
-    \label{fig:Ports-PoE}
+    \includegraphics[width=1.0\linewidth]{figures/screenshot1}
+    \caption{Übersicht über einen Switch}
+    \label{fig:overview-port}
 \end{figure}
 
-\subsubsection{Messungen}
-
-Messungen werden automatisch durch das Starten des PoE-Tools erzeugt. Die
-Parameter für die Messmethode werden mittels config-file konfiguriert. Siehe Abschnitt Konfiguration.
-
 \subsubsection{CSV Export}
-
-Durch einen Klick auf den Button \textbf{Export} können sämtliche Messungen im
-angegebenen Zeitraum welcher definiert ist in ein csv-file export werden. Dazu
-muss dann lediglich im auftauchenden Datei-Dialog der entsprechende Ort und der
-Dateiname gewählt werden.
+Durch einen Klick auf den Button \textbf{Export} können sämtliche Messungen, welche im angegebenen Zeitraum für den ausgewählten Switch gemacht wurden, in ein CSV-file exportiert werden. Durch betätigen des \textbf{Export} Buttons, wird ein Datei-Dialog angezeigt, in welchen man Ort und Name der resultierenden CSV Datei angeben muss.
