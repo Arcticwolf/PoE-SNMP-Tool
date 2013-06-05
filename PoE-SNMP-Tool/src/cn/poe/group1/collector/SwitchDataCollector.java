@@ -4,6 +4,7 @@ import cn.poe.group1.Main;
 import cn.poe.group1.api.Configuration;
 import cn.poe.group1.api.MeasurementBackend;
 import cn.poe.group1.api.RetrieverException;
+import cn.poe.group1.entity.Measurement;
 import cn.poe.group1.entity.Port;
 import cn.poe.group1.entity.Switch;
 import java.util.ArrayList;
@@ -40,12 +41,16 @@ public class SwitchDataCollector {
 
             @Override
             public void run() {
+                List<Measurement> measurements = new ArrayList<>();
                 for (PortDataCollector port : ports) {
                     try {
-                        backend.saveMeasurement(port.takeMeasurement());
+                        measurements.add(port.takeMeasurement());
                     } catch (RetrieverException e) {
                         log.warn("Unable to read from port ", e);
                     }
+                }
+                for (Measurement measurement : measurements) {
+                    backend.saveMeasurement(measurement);
                 }
             }
             
