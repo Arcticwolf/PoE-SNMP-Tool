@@ -13,6 +13,6 @@ public interface SNMPDataRetriever {
      * actually be measured need to be defined in the implementing class.
      * @return A measurement object with the measured value
      */
-    Measurement takeMeasurement();
+    Measurement takeMeasurement() throws RetrieverException;
     
 }

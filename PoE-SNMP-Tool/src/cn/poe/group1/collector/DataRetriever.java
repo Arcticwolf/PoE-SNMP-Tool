@@ -1,5 +1,6 @@
 package cn.poe.group1.collector;
 
+import cn.poe.group1.api.RetrieverException;
 import cn.poe.group1.api.SNMPDataRetriever;
 import cn.poe.group1.entity.Measurement;
 import cn.poe.group1.entity.Port;
@@ -7,7 +8,6 @@ import cn.poe.group1.entity.PortStatus;
 import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
@@ -29,18 +29,22 @@ public class DataRetriever implements SNMPDataRetriever {
     }
 
     @Override
-    public Measurement takeMeasurement() {
-        Measurement measurement = new Measurement();
-        measurement.setPort(port);
-        measurement.setCpeExtPsePortDeviceDetected(getBoolValue(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.3.1."+port.getPortNumber())));
-        measurement.setCpeExtPsePortEnable(getPortStatus(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.1.1."+port.getPortNumber())));
-        measurement.setCpeExtPsePortMaxPwrDrawn(Integer.parseInt(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.10.1."+port.getPortNumber())));
-        measurement.setCpeExtPsePortPwrAllocated(Integer.parseInt(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.7.1."+port.getPortNumber())));
-        measurement.setCpeExtPsePortPwrAvailable(Integer.parseInt(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.8.1."+port.getPortNumber())));
-        measurement.setCpeExtPsePortPwrMax(Integer.parseInt(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.6.1."+port.getPortNumber())));
-        measurement.setCpeExtPsePortPwrConsumption(Integer.parseInt(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.9.1."+port.getPortNumber())));
-        measurement.setMeasureTime(new Date());
-        return measurement;
+    public Measurement takeMeasurement() throws RetrieverException {
+        try {
+            Measurement measurement = new Measurement();
+            measurement.setPort(port);
+            measurement.setCpeExtPsePortDeviceDetected(getBoolValue(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.3.1."+port.getPortNumber())));
+            measurement.setCpeExtPsePortEnable(getPortStatus(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.1.1."+port.getPortNumber())));
+            measurement.setCpeExtPsePortMaxPwrDrawn(Integer.parseInt(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.10.1."+port.getPortNumber())));
+            measurement.setCpeExtPsePortPwrAllocated(Integer.parseInt(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.7.1."+port.getPortNumber())));
+            measurement.setCpeExtPsePortPwrAvailable(Integer.parseInt(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.8.1."+port.getPortNumber())));
+            measurement.setCpeExtPsePortPwrMax(Integer.parseInt(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.6.1."+port.getPortNumber())));
+            measurement.setCpeExtPsePortPwrConsumption(Integer.parseInt(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.9.1."+port.getPortNumber())));
+            measurement.setMeasureTime(new Date());
+            return measurement;
+        } catch (Exception e) {
+            throw new RetrieverException("Error during reading from port " + port.getId(), e);
+        }
     }
     
     private String SNMPGet(String host, String community, String strOID) {

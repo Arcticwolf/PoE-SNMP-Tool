@@ -1,6 +1,7 @@
 package cn.poe.group1.collector;
 
 import cn.poe.group1.api.Configuration;
+import cn.poe.group1.api.RetrieverException;
 import cn.poe.group1.api.SNMPDataRetriever;
 import cn.poe.group1.entity.Measurement;
 import cn.poe.group1.entity.Port;
@@ -25,7 +26,7 @@ public class PortDataCollector {
         }
     }
     
-    public Measurement takeMeasurement() {
+    public Measurement takeMeasurement() throws RetrieverException {
         return retriever.takeMeasurement();
     }   
 }

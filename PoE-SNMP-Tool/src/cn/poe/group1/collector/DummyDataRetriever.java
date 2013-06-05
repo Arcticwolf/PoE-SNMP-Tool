@@ -1,5 +1,6 @@
 package cn.poe.group1.collector;
 
+import cn.poe.group1.api.RetrieverException;
 import cn.poe.group1.api.SNMPDataRetriever;
 import cn.poe.group1.entity.Measurement;
 import cn.poe.group1.entity.Port;
@@ -18,7 +19,7 @@ public class DummyDataRetriever implements SNMPDataRetriever {
     }
 
     @Override
-    public Measurement takeMeasurement() {
+    public Measurement takeMeasurement() throws RetrieverException {
         Measurement measurement = new Measurement();
         measurement.setPort(port);
         measurement.setCpeExtPsePortDeviceDetected(true);

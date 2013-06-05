@@ -3,13 +3,11 @@ package cn.poe.group1;
 import cn.poe.group1.api.Configuration;
 import cn.poe.group1.api.DataCollector;
 import cn.poe.group1.api.MeasurementBackend;
-import cn.poe.group1.collector.SwitchDataCollector;
 import cn.poe.group1.db.MeasurementDatabase;
 import cn.poe.group1.entity.Port;
 import cn.poe.group1.entity.Switch;
 import cn.poe.group1.gui.PoESNMPToolGUI;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -23,7 +21,6 @@ public class Main {
     private static final String FACTORY_NAME = "poe-snmp-tool";
     private static Logger log = LoggerFactory.getLogger(Main.class);
     private MeasurementBackend measurementBackend;
-    private HashMap<String, SwitchDataCollector> collectors;
     private Configuration config;
     private EntityManagerFactory factory;
     private DataCollector collector;
@@ -36,7 +33,6 @@ public class Main {
     
     public Main() throws IOException {
         this.config = new PropertyFileConfig();
-        this.collectors = new HashMap<>();
         this.factory = Persistence.createEntityManagerFactory(FACTORY_NAME);
         this.measurementBackend = new MeasurementDatabase(this.factory.createEntityManager());
         this.collector = new DataCollectorImpl(config, factory);
@@ -59,7 +55,7 @@ public class Main {
         // Just for testing impact of one MeasurementDatabase per thread
         //for (int i=0; i<5; i++) {
             //Switch sw = new Switch("testid_"+String.valueOf(i), "testIp", "testtype", 24, "testswitch");
-            Switch sw = new Switch("testid", "128.131.30.85", "testtype", 48, "testswitch");
+            Switch sw = new Switch("testid", "128.131.30.84", "testtype", 25, "testswitch");
             for (int j=1; j<=sw.getPortCount(); j++) {
                 Port p = new Port(sw, j, null);
                 sw.addPort(p);
