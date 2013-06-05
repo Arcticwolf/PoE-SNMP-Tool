@@ -171,7 +171,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     //<editor-fold defaultstate="collapsed" desc="All functions for the showing the chart">
     private JFreeChart createPortChart() {
         this.createPortDataSet();
-        JFreeChart chart = ChartFactory.createXYLineChart("PortData", "time", "mw"
+        JFreeChart chart = ChartFactory.createXYLineChart("PortData", "measurements", "mw"
                 , this.portDataSet, PlotOrientation.VERTICAL, true, true, false);
         XYPlot plot = (XYPlot) chart.getPlot();
 
@@ -189,7 +189,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     
     private JFreeChart createSwitchChart() {
         this.createSwitchDataSet();
-        JFreeChart chart = ChartFactory.createXYLineChart("SwitchData", "time", "mw"
+        JFreeChart chart = ChartFactory.createXYLineChart("SwitchData", "measurements", "mw"
                 , this.switchDataSet, PlotOrientation.VERTICAL, true, true, false);
         XYPlot plot = (XYPlot) chart.getPlot();
 
