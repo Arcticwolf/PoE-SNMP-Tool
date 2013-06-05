@@ -35,7 +35,9 @@ Das PoE-Tool wird über die Konfigurationsdatei
 \begin{description}
   \item [\textbf{measurement.interval}] Dieser Wert gibt die Zeit die zwischen
   Messungen verstreicht in ms an.
-  \item [\textbf{distribution.slots}]
+  \item [\textbf{distribution.slots}] Dieser Wert gibt in wieviele Zeitslots ein
+  Messintervall unterteilt werden soll, um eine gleichmäßigere Verteilung an
+  SNMP-Anfragen an die einzelnen Switches zu ermöglichen.
   \item [\textbf{data.retriever.impl}] Dieser Wert gibt an welche Datenquelle
   für die GUI verwendet werden soll. Es gibt 2 Datenquellen. Einerseits eine
   Test-Datenquelle für die GUI
@@ -45,10 +47,15 @@ Das PoE-Tool wird über die Konfigurationsdatei
 
 \subsection{Verwendung}
 
+Durch das Starten des PoE-Tool beginnt dieses automatisch Messungen für alle
+definierten Switches zu erzeugen. Durch Auswahl eines entsprechendes Switches in
+der linken Tabelle  können für diesen die Nutzdaten angezeigt werden.
 
 \subsubsection{Switch}
 
-df
+Durch Auswahl eines Switches in der linken Tabelle erhält man einen Überblick
+über den Switch. Auf der Registerkarte Switch im rechten Teil des Fensters
+erhält man einen Überblick den zeitlichen Verlauf der Messungen am Switch.
 
 \begin{figure}[h]
     \centering
@@ -58,8 +65,11 @@ df
     \label{fig:Ports-PoE}
 \end{figure}
 
+Durch einen Klick auf \textbf{Add Switch} in der Menüzeile kann man einen neuen
+Switch definieren welcher überwacht werden soll. Dazu müssen lediglich die Daten
+im Popup ausgefüllt und bestätigt werden.
 
-\begin{figure}[h]
+ \begin{figure}[h]
     \centering
     \leavevmode
     \includegraphics[scale=0.5]{figures/screenshot3.jpg}
@@ -69,7 +79,7 @@ df
 
 \subsubsection{Ports}
 
-df
+Auf der Registerkarte Port im rechten Teil des Fensters
 
 \begin{figure}[h]
     \centering
