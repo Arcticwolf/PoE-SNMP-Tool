@@ -51,6 +51,10 @@ Durch das Starten des PoE-Tool beginnt dieses automatisch Messungen für alle
 definierten Switches zu erzeugen. Durch Auswahl eines entsprechendes Switches in
 der linken Tabelle  können für diesen die Nutzdaten angezeigt werden.
 
+Wichtig ist hier die GUI zeigt immer die Messdaten aus einem bestimmten Zeitraum
+an. Dieser kann im PoE-Hauptfenster rechts oben definiert werden. Um die Daten
+zu aktualisieren klickt man einfach auf \textbf{Reload}.
+
 \subsubsection{Switch}
 
 Durch Auswahl eines Switches in der linken Tabelle erhält man einen Überblick
@@ -67,7 +71,7 @@ erhält man einen Überblick den zeitlichen Verlauf der Messungen am Switch.
 
 Durch einen Klick auf \textbf{Add Switch} in der Menüzeile kann man einen neuen
 Switch definieren welcher überwacht werden soll. Dazu müssen lediglich die Daten
-im Popup ausgefüllt und bestätigt werden.
+im Popup ausgefüllt und bestätigt werden. 
 
  \begin{figure}[h]
     \centering
@@ -77,9 +81,17 @@ im Popup ausgefüllt und bestätigt werden.
     \label{fig:NeuerSwitch-PoE}
 \end{figure}
 
+Zur Editierung und Löschung von Switches macht man einfach einen Rechtsklick auf
+den entsprechenden Switch in der linken Tabelle. Danach taucht ein Kontextmenü
+auf welches 2 Einträge hat \textbf{Edit Switch} (Editieren von Switches) und
+\textbf{Delete Switch} (Löschen von Switches).
+
 \subsubsection{Ports}
 
-Auf der Registerkarte Port im rechten Teil des Fensters
+Auf der Registerkarte Port im rechten Teil des Fensters können die Daten über
+die einzelnen Ports eines Switchs betrachtet werden. Die Tabelle enthält dabei
+einen Mittwert aus den Messungen über die einzelnen Parameter. Der Chart enthält
+einen graphischen Verlauf der einzelnen Parametern.
 
 \begin{figure}[h]
     \centering
@@ -91,4 +103,12 @@ Auf der Registerkarte Port im rechten Teil des Fensters
 
 \subsubsection{Messungen}
 
+Messungen werden automatisch durch das Starten des PoE-Tools erzeugt. Die
+Parameter für die Messmethode werden mittels config-file konfiguriert. Siehe Abschnitt Konfiguration.
+
 \subsubsection{CSV Export}
+
+Durch einen Klick auf den Button \textbf{Export} können sämtliche Messungen im
+angegebenen Zeitraum welcher definiert ist in ein csv-file export werden. Dazu
+muss dann lediglich im auftauchenden Datei-Dialog der entsprechende Ort und der
+Dateiname gewählt werden.
