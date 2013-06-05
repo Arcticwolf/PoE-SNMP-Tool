@@ -32,7 +32,7 @@ public class DataRetriever implements SNMPDataRetriever {
     public Measurement takeMeasurement() {
         Measurement measurement = new Measurement();
         measurement.setPort(port);
-        //measurement.setCpeExtPsePortDeviceDetected(getBoolValue(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.3.1."+port.getPortNumber())));
+        measurement.setCpeExtPsePortDeviceDetected(getBoolValue(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.3.1."+port.getPortNumber())));
         measurement.setCpeExtPsePortEnable(getPortStatus(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.1.1."+port.getPortNumber())));
         measurement.setCpeExtPsePortMaxPwrDrawn(Integer.parseInt(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.10.1."+port.getPortNumber())));
         measurement.setCpeExtPsePortPwrAllocated(Integer.parseInt(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.7.1."+port.getPortNumber())));
@@ -87,11 +87,12 @@ public class DataRetriever implements SNMPDataRetriever {
         return strResponse;
     }
     
+    // TruthValue is defined in RFC2579 (http://tools.ietf.org/html/rfc2579)
     private Boolean getBoolValue(String str) {
         Boolean ret = false;
         if(str.equals("1")) {
             ret = true;
-        } else if(str.equals("0")) {
+        } else if(str.equals("2")) {
             ret = false;
         } else {
             log.error("Couldn't convert to bool.");
