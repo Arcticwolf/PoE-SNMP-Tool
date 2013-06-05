@@ -4,7 +4,7 @@
 In dieser Sektion werden die Technologien, welche die Grundlage für das Monitoring Tool darstellen, kurz erläutert. Für jede dieser Technologien wird die Motivation und die grundsätzliche Funktionalität erklärt.
 
 \subsection{Power-over-Ethernet (PoE)}
-
+\label{sec:poe}
 Mit Power-over-Ethernet (PoE) ist es möglich, dass man Geräte über die oft schon vorhandenen Netzwerkkabel mit Strom versorgen kann. Die Idee dahinter, warum man sich überhaupt darüber Gedanken gemacht hat, war dass es eine Menge Geräte gibt die eigentlich eine geringe Stromversorgung brauchen, diesen Strom jedoch durch einen Anschluss an der Stromversorgung des Gebäudes tilgen. Was bedeutet: Überall wo man einfache Netzwerkgeräte braucht (Print-Server, Voice-over-IP Geräte, etc.) braucht man immer sowohl Netzwerk- als auch Stromkabel.
 
 Mittels PoE können die zusätzlichen Stromkabel eingespart werden, sofern das Gerät eine Ladung über das Netzwerk-Interface erlaubt. Dies eignet sich sehr gut für einige eher einfache Geräte wie Webcams, Handhelds, etc.
@@ -67,6 +67,7 @@ Wichtiger Punkt hier ist noch, dass ein PoE Switch keine Geräte beschädigen da
 Hier wird mit kleiner Stromstärke geprüft ob der Empfänger einen gewissen Stromwiderstand hat (die Bereiche sind genau definiert). Falls ja, wird geprüft welcher PoE Standard verwendet werden soll. Danach beginnt die Speisung mit Strom und die Datenverbindung wird aufgebaut.
 
 \subsection{SNMP}
+\label{sec:SNMP}
 SNMP (Simple Network Management Protocol) ist ein einfaches Mittel um Informationen Remote von einen Gerät abzufragen bzw. Remote Einstellungen an einen Gerät durchzuführen. Es wurde entworfen zu dem Zeitpunkt, an dem es mehr Computer als Experten gab und stand von Anfang an in Konkurrenz zu einen ISO standardisierten Protokoll das aber nie kam.
 
 Simple kommt vor allem daher, dass die Entwicklung dieses Protokolls darauf abzielte eine schnell implementierte und einfache Lösung für Remote-Wartung und Monitoring zu bekommen. Es wurde sowohl bei Features (z.B. Security) als auch an dem Datentypen (es gibt eigentlich keine Datentypen, sondern es werden immer nur Bits übertragen, welche bei der anfragenden Stelle interpretiert werden müssen) gespart.

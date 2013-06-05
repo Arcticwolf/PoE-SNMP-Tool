@@ -1,3 +1,17 @@
 \section{Einführung}
 \label{sec:intro}
-TODO: die Aufgabenstellung dieser Übung erläutern
+Die vorliegende Arbeit beschäftigt sich mit der Überwachung von Switches, die Endgeräte über die Datennetzverkabelung mit Strom versorgen. Die Stromversorgung erfolgt dabei über die Technologie Power-over-Ethernet (PoE), die in Abschnitt \ref{sec:poe} detaillierter beschrieben wird. Die Vorteile dieser Methode liegen in der Ersparnis von Stromverkabelung sowie in der Möglichkeit der Steuerung der Energieversorgung. PoE nutzt dabei die zur Netzwerkanbindung notwendige Ethernet-Verkabelung zur Energieversorgung der Endgeräte.
+\\
+
+Der Einsatz dieser Methode bringt jedoch auch Einschränkungen mit sich. Die Leistung, die ein Switch zur Verfügung stellen kann, ist von der Technologie limitiert. Je nach verwendetem Standard ist die Leistung je Port auf 15,4-60 Watt beschränkt. Auch die gesamte Versorgungsleistung, die ein Switch zur Verfügung stellen kann, ist begrenzt. Die Gesamtleistung ist dabei vom Switchtyp abhängig. 
+\\
+
+Bei einem großflächigen Einsatz von PoE ergibt sich aus diesen Einschränkungen die Notwendigkeit, die Leistungsabgabe der Switches zu überwachen. Verschiedene Parameter sind von besonderem Interesse für den Betrieb dieser Technologie. Dies sind zum Beispiel die Leistungsaufnahme einzelner Endgeräte, die gesamte abgegebene Leistung eines Switch, die Veränderung der Werte im Laufe des Betriebs und die verfügbare Leistung für weitere Endgeräte.
+\\
+
+Mit dem Simple Network Management Protocol (SNMP), das in Abschnitt \ref{sec:SNMP} beschrieben ist, steht eine bewährte und weit verbreitete Technologie zur Verfügung, die ein regelmäßiges Auslesen von Informationen über ein standardisiertes Protokoll erlaubt. Es ermöglicht damit Zugriff auf jene Informationen der implementierenden Netzwerkkomponente, die diese über SNMP zur Verfügung stellt. Die Definition der verfügbaren Informationen erfolgt in der Management Information Base (MIB). Mit Hilfe von SNMP können die für die zuvor erwähnte Überwachung notwendigen Daten aus einem Switch abgerufen werden, sofern dieser SNMP implementiert und die für die Überwachung des PoE-Betriebs relevanten Daten verfügbar macht.
+\\
+
+Die Zielsetzung der vorliegenden Arbeit ist es, ein Werkzeug zu entwickeln, mit dessen Hilfe die für den Betrieb von PoE relevanten Daten über einen längeren Zeitraum gesammelt werden können. Die Daten stehen somit für weitere Auswertungen zur Verfügung, um als Entscheidungsgrundlage für das Management des Betriebs zu dienen. Dabei konzentriert sich die Arbeit auf PoE-fähige Switches des Herstellers Cisco, wobei eine Einschränkung auf die beiden Typen WS-C3560G-24PS-S und WS-C2960S-48FPS-L erfolgt. Vorbereitend werden jene Informationen identifiziert, die von den beiden Switchtypen verfügbar gemacht werden können und für die Zielsetzung relevant sind. In weiterer Folge wird eine Software entwickelt, die die ausgewählten Informationen in regelmäßigen Abständen abruft. Dabei findet das bereits erwähnte SNMP Verwendung. Die Daten werden in der Software visualisiert, und können für eine weitere Verarbeitung in einem standardisierten Format exportiert werden.
+
+
