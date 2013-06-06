@@ -408,7 +408,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     
     private void addSwitch(Switch sw) {
         try {
-            for (int i=0; i<sw.getPortCount(); i++) {
+            for (int i=1; i<=sw.getPortCount(); i++) {
                 Port p = new Port(sw, i, null);
                 sw.addPort(p);
             }
@@ -597,7 +597,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                 .addComponent(btnRefresh2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnExport)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(156, Short.MAX_VALUE))
         );
         pMeasurementTimeLayout.setVerticalGroup(
             pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
