@@ -68,15 +68,22 @@ Hier wird mit kleiner Stromstärke geprüft ob der Empfänger einen gewissen Str
 
 \subsection{SNMP}
 \label{sec:SNMP}
-SNMP (Simple Network Management Protocol) ist ein einfaches Mittel um Informationen Remote von einen Gerät abzufragen bzw. Remote Einstellungen an einen Gerät durchzuführen. Es wurde entworfen zu dem Zeitpunkt, an dem es mehr Computer als Experten gab und stand von Anfang an in Konkurrenz zu einen ISO standardisierten Protokoll das aber nie kam.
+Simple Network Management Protocol (SNMP) ist ein in RFC 1157 definiertes Protokoll zur Überwachung und zum Management von Netzwerkkomponenten.\cite{rfc1157} In RFC 3410 werden Erweiterungen definiert, die als SNMPv3 aktueller De-facto-Standard sind.\cite{rfc3410}
 
-Simple kommt vor allem daher, dass die Entwicklung dieses Protokolls darauf abzielte eine schnell implementierte und einfache Lösung für Remote-Wartung und Monitoring zu bekommen. Es wurde sowohl bei Features (z.B. Security) als auch an dem Datentypen (es gibt eigentlich keine Datentypen, sondern es werden immer nur Bits übertragen, welche bei der anfragenden Stelle interpretiert werden müssen) gespart.
+Das Protokoll zielte darauf ab, eine schnell zu implementierende und einfache Lösung für das Management von Netzwerkkomponenten zu erhalten. Bei der Definition von SNMP wurden daher Abstriche beispielsweise hinsichtlich der Sicherheit in Kauf genommen. In SNMPv3 wurden diesbezüglich einige Verbesserungen vorgenommen.
 
-Die Kommunikation bei SNMP ist nach dem Manager/Agent Prinzip strukturiert. Agent verwaltet Ressourcen und liefert Messwerte bzw. kann Einstellungen durchführen. Manager fragt Agent nach Messwerten bzw. schickt ihm Anfragen auf Änderungen von Einstellungen.
+Bei SNMP wird zwischen zwei Entitäten unterschieden, Manager und Agents. Manager, oft auch als Network Management Stations (NMS) bezeichnet, sind für das Abrufen und Empfangen von Informationen über SNMP verantwortlich.\cite{essential-SNMP} Agents sind Software-Artefakte, die auf den Netzwerkkomponenten ausgeführt werden. Ihre Aufgabe ist es, Managern Daten zur Verfügung zu stellen oder diese an die Manager zu senden. Abfragen des Managers an den Agent werden als Query bezeichnet. Unter Trap versteht man eine asynchrone Übermittlung des Agenten an den Manager, nachdem der Agent den Eintritt eines vordefinierten Ereignisses festgestellt hat. Bild \ref*{fig:snmp-schema} stellt die Beziehung der beiden Enitäten zu einander schematisch dar.
 
-Die Struktur der Messwerte als auch der Einstellungen die vom Agent abgefragt bzw. durch ihn geändert werden können ist intern als Baum aufgebaut. Informationen stehen nur in den Blättern (entweder skalarer Wert oder zweidimensionale Tabelle). Die Knoten sind nur für die Strukturierung der Daten wichtig.
+\begin{figure}[tbph]
+\centering
+\includegraphics[width=0.7\linewidth]{./figures/snmp-schema}
+\caption{Schema der Manager/Agent-Beziehung, aus \cite{essential-SNMP}}
+\label{fig:snmp-schema}
+\end{figure}
 
-\begin{figure}[h]
+Die vom Agent verfügbar gemachten Daten sind in als Baum aufgebauten Datenbanken, den sogenannten Management Information Base(s) (MIB), definiert. Ein Agent kann dabei mehrere MIBs implementieren.\cite{essential-SNMP} Die Informationen stehen dabei in den Blättern des Baums zur Verfügung. Die Knoten dienen zur Organisation des Baums. Der Zugriff auf ein Blatt erfolgt anhand von eindeutigen Object Identifiern (OID), die einen Pfad im Baum zum gewünschten Blatt darstellen. Abbildung \ref{fig:snmptree} zeigt beispielhaft, wie ein solcher Baum aussehen könnte. In diesem Baum gibt es insgesamt sechs Blätter, es kann somit auf sechs Daten zugegriffen werden. Die OID 1.3.17.18 verweist hierbei auf das mittlere Blatt des rechten Astes. Neben den OIDs werden in MIBs weitere Informationen wie zum Beispiel ein sprechender Name und ein Datentyp für das jeweilig beschriebene Objekt festgelegt.
+
+\begin{figure}[H]
   \begin{center}
     \begin{tikzpicture}[level/.style={sibling distance=30mm/#1}]
       \node [circle,draw] {$1$}
@@ -93,28 +100,18 @@ Die Struktur der Messwerte als auch der Einstellungen die vom Agent abgefragt bz
          }
        };
     \end{tikzpicture}
-    \caption{Beispiel SNMP Baum}
+    \caption{Beispiel eines MIB Baumes}
     \label{fig:snmptree}
   \end{center}
 \end{figure}
 
-Abbildung \ref{fig:snmptree} zeigt ein Beispiel wie so ein Baum aussehen könnte. In diesem Baum gibt es insgesamt 6 Blätter, also können 6 Werte mit Hilfe von SNMP gelesen bzw. geändert werden. Adressiert werden die Elemente mit ihrer OID, welcher einfach den Pfad bis zum Blatt beschreibt (bsp. 1.3.17.18).
-
-Diese Werte und deren OIDs sind zwar schön und gut, jedoch für einen Menschen praktisch unlesbar. Man müsste für jedes Gerät genau wissen unter welcher OID welche Information gespeichert ist. Dies liegt daran, dass bei der Spezifikation von SNMP keine Definition gemacht wurde, welche Information unter welcher OID gefunden werden kann.
-
-Für diesen Grund wurde die Management Information Base (MIB) definiert. In einer solchen MIB steht, welcher OID welche Information bereit hält, welchen Typ diese Information hat usw. Hier gibt es mittlerweile schon einige definierte Gruppen. Eine Gruppe bestimmt welche OID welche Information zurück geben soll (zb. Management Gruppe, Drucker Gruppe, ...). Diese Gruppen werden normalerweise auch von den Geräten die SNMP bereitstellen unterstützt.
-
-Die Kommunikation zwischen Manager und Agent funktioniert über Protocol Data Units (PDUs). Grundsätzlich gibt es fünf dieser PDUs in SNMP:
+Die Kommunikation zwischen Manager und Agent erfolgt über Protocol Data Units (PDUs), die das Nachrichtenformat der Kommunikation festlegen.\cite{essential-SNMP} Die wichtigsten fünf PDUs sind die folgenden:
 
 \begin{description}
-  \item[GET\_REQUEST:] Manager stellt Agent eine Frage (z.b: Wie schnell dreht sich Lüfter A?). Als Antwort bekommt Manager ein \textbf{GET\_RESPONSE} vom Agenten.
-  \item[GET\_RESPONSE:] Agent antwortet auf eine Anfrage.
-  \item[SET\_REQUEST:] Manager befiehlt Agenten die Änderung an einer Einstellung (z.b: erhöhe die Drehzahl von Lüfter A). Als Antwort bekommt Manager ein \textbf{GET\_RESPONSE} vom Agenten, welche normalerweise den aktualisierten Wert enthält.
-  \item[GET\_NEXT\_REQUEST:] Manager fragt den Agenten nach dem Wert der im Baum als nächstes aufgelistet ist (z.b. gib mir die Drehzahl des nächsten Lüfters). Als Antwort bekommt der Manager eine \textbf{GET\_RESPONSE} mit dem Wert vom Agenten. Da es sich aber nur um den nächsten Wert im Baum handelt, muss es nicht unbedingt sein, dass der gelesene Wert wirklich der gewünschte Wert ist (z.B. das System hat nur einen Lüfter). Um mit diesen Fällen umgehen zu können, gelten zwei Voraussetzungen:
-  \begin{itemize}
-    \item Manager muss wissen, dass es einen nächsten Wert gibt oder zumindest erkennen, dass der nächste Wert ihn nicht mehr interessiert (z.B. anhand der OID).
-    \item Agent muss Vergleichsoperatoren beherrschen.
-  \end{itemize}
-  \item[TRAP:] Agent schickt zu einen vorher konfigurierten Manager eine Nachricht, falls ein bestimmter Fall eingetreten ist (z.B. der Lüfter dreht sich zu schnell → Überhitzung droht!)
+  \item[GET REQUEST:] Anfrage des Managers an den Agent. Der Agent beantwortet die Anfrage mit einem \textbf{GET RESPONSE}.
+  \item[GET RESPONSE:] Antwort eines Agents auf eine Anfrage.
+  \item[SET REQUEST:] Manager fordert einen Agent zur Änderung eines Wertes auf. Als Antwort erhält der Manager ein \textbf{GET RESPONSE} vom Agent. Im Fehlerfall wird dem Manager darin ein Fehlercode übermittelt.
+  \item[GET\_NEXT REQUEST:] Manager forder jenen Wert im Baum an, der als nächstes aufgelistet ist. Dabei wird eine Tiefensuche angewendet. Der Agent beantwortet die Anfrage mit einem \textbf{GET RESPONSE}. Hierbei ist jedoch zu beachten, dass dieser Wert nicht zwingend der tatsächlich gewünschte Wert ist. Existiert das gewünschte Blatt nicht, liefert die Anfrage trotzdem das Datum des nächsten Knotens.
+  \item[TRAP:] Im Eintrittsfall eines vordefinierten Ereignisses sendet der Agent an einen zuvor konfigurierten Manager eine Nachricht. Der Agent erhält hierbei keinerlei Bestätigung über den Empfang der Trap.
 \end{description}
 
