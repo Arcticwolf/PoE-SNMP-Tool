@@ -10,6 +10,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -22,6 +23,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileFilter;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -158,9 +160,24 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
             fc.setDialogTitle("Select file for CSV export");
             fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
             fc.setMultiSelectionEnabled(false);
+            fc.setFileFilter(new FileFilter() {
+                @Override
+                public boolean accept(File f) {
+                    if (f.isDirectory() 
+                            || f.getName().toLowerCase().endsWith(".csv")) {
+                        return true;
+                    }
+                    return false;
+                }
+
+                @Override
+                public String getDescription() {
+                    return "Comma Separated Values (.csv)";
+                }
+            });
             int returnVal = fc.showSaveDialog(this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
-                collector.exportMeasurements(measurements, fc.getSelectedFile().getAbsolutePath());
+                collector.exportMeasurements(measurements, fc.getSelectedFile().getAbsolutePath() + ".csv");
             }
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "Failed to export measurements.", 
