@@ -1,4 +1,87 @@
-\section{Cisco PoE Switch}
+\section{Switche und SNMP-MIB}
 \label{sec:cisco}
 
-// TODO: erkläre was der Switch kann bezüglich PoE und wie es mit SNMP Support aussieht
+Die f\"ur die vorliegende Arbeit verwendeten Switchtypen von Cisco sind ein 24 Port Gigabit Switch des Typs WS-C3560G-24PS-S, sowie ein 48 Port Gigabit Switch des Typs WS-C2960S-48FPS-L. Beide Switchtypen werden \"ublicherweise im Access-Bereich eingesetzt und unterst\"utzen folgende PoE-Standards bzw. Protokolle:
+\begin{description}
+\item[Cisco pre-standard powered devices:] Cisco-propriet\"ares Protokoll, welches das Cisco Discovery Protocol verwendet um den Switch mitzuteilen, dass das Endger\"at PoE-f\"ahig ist. Wird zum Beispiel von Ciscos IP Telefonen oder Access Points verwendet.
+\item[Cisco intelligent power management:] Ist ebenso ein Cisco-propriet\"ares Protokoll und eine erneuerte und erweiterte Version von \emph{Cisco pre-standard powered devices}.
+\item[IEEE 802.3af]
+\item[IEEE 802.3at:] Auch als PoE+ bezeichnet. Au{\ss}erdem wird Universal Power over Ethernet, eine Cisco-propriet\"are Erweiterung des Standards, f\"ur bis zu 60 Watt Versorgungsleistung pro Port, unterst\"utzt.
+\end{description}
+
+\subsection{Endger\"ate-Erkennung und initiale Leistungszuweisung}
+Da die Switches jedoch nicht gleichzeitig die maximal m\"ogliche Wattanzahl auf allen Ports bereitstellen k\"onnen, ist ein umfangreiches Power-Management notwendig. Die Switche stellen daf\"ur ein globales PoE-Power Budget zur Verf\"ugung. Die Gr\"o{\ss}e des Budgets ist dabei abh\"angig vom Switchtyp und der Portanzahl. Bei den uns zur Verf\"ugung gestellten Switchtypen betr\"agt das Power Budget 370 Watt (WS-C3560G-24PS-S)\cite{cisco-c3560g-datasheet} sowie 740 Watt (WS-C2960S-48FPS-L)\cite{cisco-c2960s-datasheet}.
+
+Bei Anschluss eines PoE-Endger\"ates erkennen die Switches ein Cisco pre-standard kompatibles bzw. nach IEEE 802.3-Standard kompatibles Endger\"at, wenn der jeweilige Port PoE-f\"ahig ist, nicht administrativ deaktiviert wurde, PoE am Port aktiviert ist (dies ist standardm\"a{\ss}ig der Fall) und das angeschlossene Endger\"at nicht bereits mittels Netzteil versorgt wird. Sind diese Bedingungen erf\"ullt, wird bei Anschluss eines PoE-Ger\"ats an einen PoE-Port folgenderma{\ss}en eine initiale Leistungszuweisung aus dem Globalbudget des Switches dem Port zugewiesen:
+\begin{itemize}
+\item [-] im Falle eines Cisco pre-standard Endger\"ats: 15,4 Watt (Bzw. 30 Watt wenn der Switch PoE+-f\"ahig ist.)
+\item [-] im Falle eines Endger\"ats welches die IEEE-Standards 802.3af u. 802.3at unterst\"utzt, nach der Leistungsklassifikation des Standards, abgebildet in Tabelle \ref{tab:ieeepowerclassifications}.
+\begin{table}[h]
+ \centering
+ \begin{tabular}{|c|c|}
+   \hline
+   \textbf{Klasse} & \textbf{Max. Speiseleistung} \\
+   \hline
+   0 (default) & 15,4 Watt \\
+   \hline
+   1 & 4 Watt \\
+   \hline
+   2 & 7 Watt \\
+   \hline
+   3 & 15,4 Watt \\
+   \hline
+   4 & 30 Watt \\
+   \hline
+ \end{tabular}
+ \caption{IEEE Power Classifications \cite{poe2}}
+ \label{tab:ieeepowerclassifications}
+\end{table}
+\end{itemize}
+
+Bei Ver\"anderung der Portbelegung sowie in einem regelm\"a{\ss}igen Intervall \"uberpr\"uft der Switch, ob sich die Leistungsanforderungen der Endger\"ate ge\"andert haben und gew\"ahrt oder verweigert die Leistungsanforderungen der Endger\"ate je nach vorhandenem Power-Budget.
+
+\subsection{Power Management Modi}
+\label{subsec:power-management-modes}
+Die beiden Switchtypen unterst\"utzen die folgenden Power Management Modi bezogen auf einzelne PoE-Ports:
+\begin{description}
+\item [auto:] Der Switchport erkennt automatisch ob das angeschlossene Endger\"at PoE-f\"ahig ist und gew\"ahrt oder verweigert die Leistungsanfrage entsprechend dem verf\"ugbarem Power-Budget. F\"ur die Leistungszuweisung an die Endger\"ate gilt hierbei die first-come-first-served Regel. Der auto-Mode ist standardm\"a{\ss}ig auf allen PoE-Ports aktiviert.
+\item [static:] Die Switchports in diesem Power Modus haben bei der Leistungszuweisung Priorit\"at gegen\"uber den Ports im auto-Modus. Ihnen wird die konfigurierte Leistungsanforderung, sofern durch das globale Power-Budget gedeckt, standardm\"a{\ss}ig zugewiesen.
+\item [never:] Auf diesen Switchports ist Power over Ethernet deaktiviert. 
+\end{description}
+
+\subsection{Power Monitoring mittels SNMP-MIB}
+Der Switch misst und sammelt verschiedenste Werte beim PoE-Betrieb und stellt diese durch eine SNMP-MIB, der CISCO-POWER-ETHERNET-EXT-MIB\cite{cisco-poe-ext-mib}, zur Verf\"ugung.
+Diese MIB ist auch in dieser Arbeit von zentraler Bedeutung, da alle notwendigen Leistungsdaten durch diese MIB ausgelesen werden k\"onnen.
+
+Diese MIB stellte eine gro{\ss}e Anzahl an PoE-bezogenen Objects zur Verf\"ugung, im folgenden sind aber nur die f\"ur diese Arbeit relevanten OIDs n\"aher erl\"autert.
+
+Relevante OIDs:
+\begin{description}
+\item[cpeExtPsePortEnable:] Power Management Modus des Ports.
+M\"ogliche Werte:
+\begin{description}
+\item ['1' (auto):] Standardeinstellung der Ports. Weitere Erkl\"arungen in Absatz \ref{subsec:power-management-modes}.
+\item ['2' (static):] Leistung fix konfiguriert.
+\item ['3' (limit):] Leistung per Konfiguration beschr\"ankt.
+\item ['4' (disable):] PoE deaktiviert.
+\end{description}
+
+\item[cpeExtPsePortDeviceDetected:] Zeigt, ob ein PoE-f\"ahiges Endger\"at am Port erkannt wurde.
+M\"ogliche Werte:
+\begin{description}
+\item ['1' (true):] PoE-f\"ahiges Endger\"at erkannt
+\item ['2' (false):] kein PoE-f\"ahiges Endger\"at erkannt
+\end{description}
+
+\item[cpeExtPsePortPwrMax:] Maximal verf\"ugbare Leistung am Port; konfigurierbar (in Milliwatt)
+\item[cpeExtPsePortPwrAllocated:] Zugewiesene Leistung am Port (in Milliwatt)
+\item[cpeExtPsePortPwrAvailable:] Verf\"ugbare Leistung am Port, kann sich von der zugewiesenen Leistung (\emph{cpeExtPsePortPwrAllocated}) unterscheiden. (in Milliwatt)
+\item[cpeExtPsePortPwrConsumption:] Tats\"achlicher Verbrauch des Endger\"ats. (in Milliwatt)
+\item[cpeExtPsePortMaxPwrDrawn:] Maximale Leistungsabnahme des angeschlossenen Endger\"ats seit Einschaltung des Endger\"ats. (in Milliwatt)
+
+\end{description}
+
+
+
+
+
