@@ -514,8 +514,6 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         tblPorts = new javax.swing.JTable();
         pSwitchData = new javax.swing.JPanel();
-        jspSwitchData = new javax.swing.JSplitPane();
-        jPanel1 = new javax.swing.JPanel();
         pSwitchChart = new javax.swing.JPanel();
         jToolBar1 = new javax.swing.JToolBar();
         btnExit = new javax.swing.JButton();
@@ -614,7 +612,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
                 .addComponent(btnRefresh2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnExport)
-                .addContainerGap(156, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pMeasurementTimeLayout.setVerticalGroup(
             pMeasurementTimeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -697,28 +695,8 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
 
         pSwitchData.setLayout(new java.awt.BorderLayout());
 
-        jspSwitchData.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
-
-        jPanel1.setMinimumSize(new java.awt.Dimension(100, 250));
-        jPanel1.setPreferredSize(new java.awt.Dimension(983, 250));
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1025, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 250, Short.MAX_VALUE)
-        );
-
-        jspSwitchData.setTopComponent(jPanel1);
-
         pSwitchChart.setLayout(new java.awt.BorderLayout());
-        jspSwitchData.setBottomComponent(pSwitchChart);
-
-        pSwitchData.add(jspSwitchData, java.awt.BorderLayout.CENTER);
+        pSwitchData.add(pSwitchChart, java.awt.BorderLayout.CENTER);
 
         jTabbedPane1.addTab("Switch", pSwitchData);
 
@@ -825,7 +803,6 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane jTabbedPane1;
@@ -835,7 +812,6 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
     private com.toedter.components.JSpinField jpfEndMinute;
     private com.toedter.components.JSpinField jpfStartMinute;
     private javax.swing.JSplitPane jspPortData;
-    private javax.swing.JSplitPane jspSwitchData;
     private javax.swing.JLabel lblMeasureTime;
     private javax.swing.JPanel pCenter;
     private javax.swing.JPanel pChart;
