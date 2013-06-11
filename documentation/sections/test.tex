@@ -88,6 +88,20 @@ In Abbildung \ref{fig:switchDetails} sieht man die Auswirkungen durch die Deakti
 
 Wie in Abbildung \ref{fig:switchDetails} gut gesehen werden kann, dauert der Prozess bis sich die Verbrauchscharakteristik wieder normalisiert hat nach dem Einschalten eines Ports deutlich länger als nach dem Ausschalten eines Ports. Die Erklärung hierfür wurde schon in den Details der Auswirkungen auf einen einzelnen Port erläutert.
 
+Nachdem diese Tests abgeschlossen waren, wurde noch die Anfrage gestellt, dass getestet werden sollte, was bei der gleichzeitigen Deaktivierung beziehungsweise Aktivierung der Ports, mit angeschlossenen Abnehmern, passiert. Hierfür wurde eine entsprechende Messung durchgeführt.
+
+\begin{figure}[h]
+    \centering
+    \leavevmode
+    \includegraphics[width=1.0\linewidth]{figures/blackout}
+    \caption{Screenshot Verlauf Switch bei Blackout}
+    \label{fig:blackout}
+\end{figure}
+
+Abbildung \ref{fig:blackout} zeigt den Verlauf des Switches bei dem gegebenen 'Blackout' Szenario. Hier verzichten wir auf einen Screenshot der einzelnen Ports, da sie sich gleich verhalten wie bei unseren Standard Szenario. Man kann sehen, dass kurz vor der 15. Messung, die Ports deaktiviert wurden, was einen Fall auf 0 der einzelnen Messwerte zur Folge hatte. Kurz vor Messung 25 wurden die Ports wieder aktiviert.
+
+Wie in der Abbildung zu sehen ist, hat der \textit{PwrAllocated} wieder einen kurzfristig höheren Wert als bei dem normalen Idle Betrieb. Man kann außerdem erkennen, dass die Ports vermutlich sequentiell gestartet werden, was den annähernd linearen Anstieg des Verbrauchs abgelesen werden kann. Nach circa 6 Messungen (also circa 12 Sekunden) befindet sich der Switch dann wieder im Normalzustand.
+
 \subsection{Probleme und Lösungen}
 Während der Testläufe unseres Tools sind ein paar Probleme aufgetreten, welche aber alle gefunden und behoben werden konnten. Ein paar dieser Probleme und deren Lösung sind im folgenden aufgelistet:
 

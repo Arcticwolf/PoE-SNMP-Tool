@@ -73,7 +73,7 @@ public class PoESNMPToolGUI extends javax.swing.JFrame {
         this.jdcEndDate.setDate(GUIUtils.getCurrentDay(1));
         Calendar calendar = Calendar.getInstance();
         this.cbStartHour.setSelectedIndex(calendar.get(Calendar.HOUR_OF_DAY));
-        this.cbEndHour.setSelectedIndex(calendar.get(Calendar.HOUR_OF_DAY) + 1);
+        this.cbEndHour.setSelectedIndex(calendar.get(Calendar.HOUR_OF_DAY));
 
         refreshMeasurementDates();
         
