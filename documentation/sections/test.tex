@@ -1,9 +1,9 @@
 \section{Testaufbau und Ergebnisse}
 \label{sec:test}
-Nachdem die Implementierung des Tools abgeschlossen war, wurde es mit realen Geräten getestet, um es für den Produktiveinsatz rüsten zu können. Hierfür sei unser Dank dem \emph{Zentralen Informatik Dienst (ZID)} (im speziellen Ing. Gonschorowski und DI (FH) Faber) gewidmet, welche uns entsprechende Geräte zur Verfügung gestellt haben.
+Nachdem die Implementierung des Tools abgeschlossen war, wurde es mit realen Geräten getestet, um es für den Produktiveinsatz rüsten zu können. Hierfür sei unser Dank dem \emph{Zentralen Informatik Dienst (ZID) der TU Wien} (im speziellen Ing. Gonschorowski und DI (FH) Faber) gewidmet, welche uns entsprechende Geräte zur Verfügung gestellt haben.
 
 \subsection{Testaufbau}
-Um unsere Tests durchzuführen wurden uns zwei PoE fähige Switches vom ZID zur Verfügung gestellt. Einer hatte keine Abnehmer angeschlossen und hatte 24 Ports und der zweite hatte 48 Ports angeschlossen, wobei an 15 Ports Abnehmer angeschlossen waren (VoIP Telefone). Abbildung \ref{fig:switches} zeigt eine Übersichtsgrafik über den Aufbau.
+Um unsere Tests durchzuführen wurden uns zwei PoE-fähige Switches vom ZID zur Verfügung gestellt. Einer hatte keine Abnehmer angeschlossen und hatte 24 Ports und der zweite hatte 48 Ports angeschlossen, wobei an 16 Ports Abnehmer angeschlossen waren (VoIP Telefone). Abbildung \ref{fig:switches} zeigt eine Übersichtsgrafik über den Aufbau.
 
 \begin{figure}[h]
     \centering
@@ -20,9 +20,9 @@ Für die Testfälle wurde unser Tool mit den folgenden Einstellungen initialisie
 \end{itemize}
 
 \subsection{Testablauf}
-Wie bereits erwähnt, bekam unser Team Zugriff auf zwei PoE fähige Switches. Da einer der beiden keine Abnehmer angeschlossen hatte, war dieser für den Test des Tools nur sehr eingeschränkt hilfreich (hauptsächlich um zu prüfen wie lange eine Antwort auf einen SNMP Request dauert, beziehungsweise ob die Daten in erwarteter Form zurückgegeben wurden).
+Wie bereits erwähnt, bekam unser Team Zugriff auf zwei PoE-fähige Switches. Da einer der beiden keine Abnehmer angeschlossen hatte, war dieser für den Test des Tools nur sehr eingeschränkt hilfreich (hauptsächlich um zu prüfen wie lange eine Antwort auf einen SNMP Request dauert, beziehungsweise ob die Daten in erwarteter Form zurückgegeben wurden).
 
-Unsere Tests beschäftigten sich hauptsächlich mit dem Switch an welchen Abnehmer angeschlossen wurden. Da wir keinen physischen Zugang zu den Gerät hatten, überlegten wir uns eine Möglichkeit unser Tool vernünftig remote testen zu können.
+Unsere Tests beschäftigten sich hauptsächlich mit dem Switch, an welchen Abnehmer angeschlossen wurden. Da wir keinen physischen Zugang zu den Geräten hatten, überlegten wir uns eine Möglichkeit unser Tool vernünftig remote testen zu können.
 
 Wir kamen zu den Schluss, dass es am Besten ist einzelne Ports remote zu deaktivieren um sie nach einiger Zeit wieder zu aktivieren. Um die Auswirkung von Deaktivierung und Aktivierung der Ports gut sichtbar zu machen und einfacher analysierbar zu machen wurde folgender Ablauf definiert:
 
@@ -38,7 +38,7 @@ Wir kamen zu den Schluss, dass es am Besten ist einzelne Ports remote zu deaktiv
 Dieser Ablauf wurde durchgeführt und die Ergebnisse dazu dokumentiert.
 
 \subsubsection{Auswirkungen auf einen Port}
-In Abbildung \ref{fig:portDetails} sieht man die Auswirkungen durch die Deaktivierung und anschließender Aktivierung eines Ports bezüglich der Werte die durch SNMP. Zwischen der 47 und 48 Messung im Abfragezeitraum wurde das Port per Administration deaktiviert. Augenblicklich fallen die Werte, die mit dem tatsächlichen Verbrauch des Gerätes auf diesen Port zu tun haben, auf 0. 
+In Abbildung \ref{fig:portDetails} sieht man die Auswirkungen durch die Deaktivierung und anschließender Aktivierung eines Ports bezüglich der Werte die durch SNMP ausgelesen wurden. Zwischen der 47. und 48. Messung im Abfragezeitraum wurde das Port administrativ deaktiviert. Augenblicklich fallen die Werte, die mit dem tatsächlichen Verbrauch des Gerätes auf diesen Port zu tun haben, auf 0. 
 
 Bei oder kurz vor Messung 70 wurde das Port wieder aktiviert. Wie man sieht, stieg hierbei der Wert für \textit{PwrAllocated} kurzzeitig auf ein lokales Maximum. Dies liegt daran, dass der Port für den Einschaltvorgang des Gerätes, welches an dem Port hängt, eine höhere Leistung anbieten kann. Kurz darauf normalisiert sich dieser Wert wieder und fällt auf das Mittel (welches vom Switch berechnet wird) zurück.
 
@@ -98,7 +98,7 @@ Nachdem diese Tests abgeschlossen waren, wurde noch die Anfrage gestellt, dass g
     \label{fig:blackout}
 \end{figure}
 
-Abbildung \ref{fig:blackout} zeigt den Verlauf des Switches bei dem gegebenen 'Blackout' Szenario. Hier verzichten wir auf einen Screenshot der einzelnen Ports, da sie sich gleich verhalten wie bei unseren Standard Szenario. Man kann sehen, dass kurz vor der 15. Messung, die Ports deaktiviert wurden, was einen Fall auf 0 der einzelnen Messwerte zur Folge hatte. Kurz vor Messung 25 wurden die Ports wieder aktiviert.
+Abbildung \ref{fig:blackout} zeigt den Verlauf des Switches bei dem gegebenen 'Blackout'-Szenario. Hier verzichten wir auf einen Screenshot der einzelnen Ports, da sie sich gleich verhalten wie bei unseren Standard Szenario. Man kann sehen, dass kurz vor der 15. Messung, die Ports deaktiviert wurden, was einen Fall auf 0 der einzelnen Messwerte zur Folge hatte. Kurz vor Messung 25 wurden die Ports wieder aktiviert.
 
 Wie in der Abbildung zu sehen ist, hat der \textit{PwrAllocated} wieder einen kurzfristig höheren Wert als bei dem normalen Idle Betrieb. Man kann außerdem erkennen, dass die Ports vermutlich sequentiell gestartet werden, was den annähernd linearen Anstieg des Verbrauchs abgelesen werden kann. Nach circa 6 Messungen (also circa 12 Sekunden) befindet sich der Switch dann wieder im Normalzustand.
 

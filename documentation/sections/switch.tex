@@ -1,4 +1,4 @@
-\section{Switche und SNMP-MIB}
+\section{Switches und SNMP-MIB}
 \label{sec:cisco}
 
 Die f\"ur die vorliegende Arbeit verwendeten Switchtypen von Cisco sind ein 24 Port Gigabit Switch des Typs WS-C3560G-24PS-S, sowie ein 48 Port Gigabit Switch des Typs WS-C2960S-48FPS-L. Beide Switchtypen werden \"ublicherweise im Access-Bereich eingesetzt und unterst\"utzen folgende PoE-Standards bzw. Protokolle:
@@ -10,7 +10,7 @@ Die f\"ur die vorliegende Arbeit verwendeten Switchtypen von Cisco sind ein 24 P
 \end{description}
 
 \subsection{Endger\"ate-Erkennung und initiale Leistungszuweisung}
-Da die Switches jedoch nicht gleichzeitig die maximal m\"ogliche Wattanzahl auf allen Ports bereitstellen k\"onnen, ist ein umfangreiches Power-Management notwendig. Die Switche stellen daf\"ur ein globales PoE-Power Budget zur Verf\"ugung. Die Gr\"o{\ss}e des Budgets ist dabei abh\"angig vom Switchtyp und der Portanzahl. Bei den uns zur Verf\"ugung gestellten Switchtypen betr\"agt das Power Budget 370 Watt (WS-C3560G-24PS-S)\cite{cisco-c3560g-datasheet} sowie 740 Watt (WS-C2960S-48FPS-L)\cite{cisco-c2960s-datasheet}.
+Da die Switches jedoch nicht gleichzeitig die maximal m\"ogliche Wattanzahl auf allen Ports bereitstellen k\"onnen, ist ein umfangreiches Power-Management notwendig. Die Switches stellen daf\"ur ein globales PoE-Power-Budget zur Verf\"ugung. Die Gr\"o{\ss}e des Budgets ist dabei abh\"angig vom Switchtyp und der Portanzahl. Bei den uns zur Verf\"ugung gestellten Switchtypen betr\"agt das Power-Budget 370 Watt (WS-C3560G-24PS-S)\cite{cisco-c3560g-datasheet} sowie 740 Watt (WS-C2960S-48FPS-L)\cite{cisco-c2960s-datasheet}.
 
 Bei Anschluss eines PoE-Endger\"ates erkennen die Switches ein Cisco pre-standard kompatibles bzw. nach IEEE 802.3-Standard kompatibles Endger\"at, wenn der jeweilige Port PoE-f\"ahig ist, nicht administrativ deaktiviert wurde, PoE am Port aktiviert ist (dies ist standardm\"a{\ss}ig der Fall) und das angeschlossene Endger\"at nicht bereits mittels Netzteil versorgt wird. Sind diese Bedingungen erf\"ullt, wird bei Anschluss eines PoE-Ger\"ats an einen PoE-Port folgenderma{\ss}en eine initiale Leistungszuweisung aus dem Globalbudget des Switches dem Port zugewiesen:
 \begin{itemize}
@@ -53,11 +53,11 @@ Die beiden Switchtypen unterst\"utzen die folgenden Power Management Modi bezoge
 Der Switch misst und sammelt verschiedenste Werte beim PoE-Betrieb und stellt diese durch eine SNMP-MIB, der CISCO-POWER-ETHERNET-EXT-MIB\cite{cisco-poe-ext-mib}, zur Verf\"ugung.
 Diese MIB ist auch in dieser Arbeit von zentraler Bedeutung, da alle notwendigen Leistungsdaten durch diese MIB ausgelesen werden k\"onnen.
 
-Diese MIB stellte eine gro{\ss}e Anzahl an PoE-bezogenen Objects zur Verf\"ugung, im folgenden sind aber nur die f\"ur diese Arbeit relevanten OIDs n\"aher erl\"autert.
+Diese MIB stellt eine gro{\ss}e Anzahl an PoE-bezogenen Objects zur Verf\"ugung, im folgenden sind aber nur die f\"ur diese Arbeit relevanten OIDs n\"aher erl\"autert.
 
 Relevante OIDs:
 \begin{description}
-\item[cpeExtPsePortEnable:] Power Management Modus des Ports.
+\item[cpeExtPsePortEnable (1.3.6.1.4.1.9.9.402.1.2.1.1.1):] Power Management Modus des Ports.
 M\"ogliche Werte:
 \begin{description}
 \item ['1' (auto):] Standardeinstellung der Ports. Weitere Erkl\"arungen in Absatz \ref{subsec:power-management-modes}.
@@ -66,18 +66,18 @@ M\"ogliche Werte:
 \item ['4' (disable):] PoE deaktiviert.
 \end{description}
 
-\item[cpeExtPsePortDeviceDetected:] Zeigt, ob ein PoE-f\"ahiges Endger\"at am Port erkannt wurde.
+\item[cpeExtPsePortDeviceDetected (1.3.6.1.4.1.9.9.402.1.2.1.3.1):] Zeigt, ob ein PoE-f\"ahiges Endger\"at am Port erkannt wurde.
 M\"ogliche Werte:
 \begin{description}
 \item ['1' (true):] PoE-f\"ahiges Endger\"at erkannt
 \item ['2' (false):] kein PoE-f\"ahiges Endger\"at erkannt
 \end{description}
 
-\item[cpeExtPsePortPwrMax:] Maximal verf\"ugbare Leistung am Port; konfigurierbar (in Milliwatt)
-\item[cpeExtPsePortPwrAllocated:] Zugewiesene Leistung am Port (in Milliwatt)
-\item[cpeExtPsePortPwrAvailable:] Verf\"ugbare Leistung am Port, kann sich von der zugewiesenen Leistung (\emph{cpeExtPsePortPwrAllocated}) unterscheiden. (in Milliwatt)
-\item[cpeExtPsePortPwrConsumption:] Tats\"achlicher Verbrauch des Endger\"ats. (in Milliwatt)
-\item[cpeExtPsePortMaxPwrDrawn:] Maximale Leistungsabnahme des angeschlossenen Endger\"ats seit Einschaltung des Endger\"ats. (in Milliwatt)
+\item[cpeExtPsePortPwrMax (1.3.6.1.4.1.9.9.402.1.2.1.6.1):] Maximal verf\"ugbare Leistung am Port; konfigurierbar (in Milliwatt)
+\item[cpeExtPsePortPwrAllocated (1.3.6.1.4.1.9.9.402.1.2.1.7.1):] Zugewiesene Leistung am Port (in Milliwatt)
+\item[cpeExtPsePortPwrAvailable (1.3.6.1.4.1.9.9.402.1.2.1.8.1):] Verf\"ugbare Leistung am Port, kann sich von der zugewiesenen Leistung (\emph{cpeExtPsePortPwrAllocated}) unterscheiden. (in Milliwatt)
+\item[cpeExtPsePortPwrConsumption (1.3.6.1.4.1.9.9.402.1.2.1.9.1):] Tats\"achlicher Verbrauch des Endger\"ats. (in Milliwatt)
+\item[cpeExtPsePortMaxPwrDrawn (1.3.6.1.4.1.9.9.402.1.2.1.10.1):] Maximale Leistungsabnahme des angeschlossenen Endger\"ats seit Einschaltung des Endger\"ats. (in Milliwatt)
 
 \end{description}
 

@@ -30,17 +30,17 @@ Das PoE-Tool wird über die Konfigurationsdatei \textbf{config.properties} angep
 \begin{description}
   \item [measurement.interval] Dieser Wert gibt die Zeit in Millisekunden an, die zwischen zwei Messungen des selben Switches vergehen sollen. Dieser Wert muss je nach Struktur des Netzwerks gewählt werden, da hier auch die Zeit die der Switch zum Antworten auf SNMP Anfragen braucht eingerechnet werden muss. Ein zu kleiner Wert raubt den Messungen die Aussagekraft.
   \item [distribution.slots] Basierend auf diesem Wert, wird das Zeitintervall, welches in \textbf{measurement.interval} definiert ist, in x Zeitslots eingeteilt. Diese Einstellung wurde eingeführt, damit nicht alle Switches immer zur gleichen Zeit befragt werden und statt dessen eine bessere Verteilung der Anfragen gewährleistet wird. Zum Beispiel: Intervall ist auf 1000 ms und Slots auf 10 eingestellt. Daraufhin wird das Intervall in 10 Slots aufgeteilt, die 100 ms von einander entfernt sind.
-  \item [\textbf{data.retriever.impl}] Dieser Wert gibt an welche Implementierung der SNMPDataRetriever, welcher verwendet wird um eine Messung via SNMP durchzuführen. Derzeit gibt es zwei Implementierungen dieses Interfaces:
+  \item [\textbf{data.retriever.impl}] Dieser Wert gibt an welche Implementierung des SNMP\-Data\-Retriever-Interfaces zu verwenden ist, welche verwendet wird um eine Messung via SNMP durchzuführen. Derzeit gibt es zwei Implementierungen dieses Interfaces:
   \begin{description}
-   \item[cn.poe.group1.collector.DummyDataRetriever:] Ist eine Testimplementierung welche das Laden von SMNP Werten nur simuliert und Testwerte zurück gibt. Wurde für die Erstellung des Prototyps verwendet.
-   \item[cn.poe.group1.collector.DataRetriever:] Ist die reale Implementierung welcher wirklich SMNP Werte von Geräten abfragt.
+   \item[cn.poe.group1.collector.DummyDataRetriever:] Ist eine Testimplementierung welche das Laden von SNMP Werten nur simuliert und Testwerte zurück gibt. Wurde für die Erstellung des Prototyps verwendet.
+   \item[cn.poe.group1.collector.DataRetriever:] Ist die reale Implementierung welcher wirklich SNMP Werte von Geräten abfragt.
   \end{description}
 \end{description}
 
 \subsection{Verwendung}
 Beim Start des PoE-Tool wird die Datenbank auf existierende Switch Definitionen überprüft. Für jede existierende Definition, wird automatisch mit den Messungen für den entsprechenden Switch begonnen. Danach wird das GUI des Tools gestartet, welche alle existierenden Definitionen in der linken Tabelle anzeigt. Wird ein Switch dort ausgewählt, werden seine Nutzdaten im rechten Feld angezeigt.
 
-Wichtig: Die GUI zeigt immer nur die Messdaten aus einem bestimmten Zeitraum an. Dieser kann im Hauptfenster rechts oben definiert werden. Um die Nutzdaten zu aktualisieren, mus der \textbf{Reload} Button betätigt werden.
+Wichtig: Die GUI zeigt immer nur die Messdaten aus einem bestimmten Zeitraum an. Dieser kann im Hauptfenster rechts oben definiert werden. Um die Nutzdaten zu aktualisieren, muss der \textbf{Reload} Button betätigt werden.
 
 \subsubsection{Switch}
 Durch die Auswahl eines Switches in der linken Tabelle, werden die entsprechenden Nutzdaten geladen. Hierbei sind die Nutzdaten kategorisch auf zwei Registerkarten aufgeteilt:
@@ -71,7 +71,7 @@ Um Switches editieren beziehungsweise löschen zu können, wurden diese Funktion
 
 \subsubsection{Ports}
 \label{sub:ports}
-Auf der Registerkarte Port im rechten Teil des Fensters können die Daten über die einzelnen Ports eines Switches betrachtet werden. Die Tabelle enthält dabei einen Mittelwert aus den Messungen über die einzelnen Parameter für den gegebenen Zeitraum. Der Chart enthält einen graphischen Verlauf der einzelnen Parametern. Abbildung \ref{fig:overview-port} zeigt wie die Port Übersicht im Tool aussieht.
+Auf der Registerkarte Ports im rechten Teil des Fensters können die Daten über die einzelnen Ports eines Switches betrachtet werden. Die Tabelle enthält dabei einen Mittelwert aus den Messungen über die einzelnen Parameter für den gegebenen Zeitraum. Das Diagramm enthält einen graphischen Verlauf der einzelnen Parametern. Abbildung \ref{fig:overview-port} zeigt wie die Port Übersicht im Tool aussieht.
 
 \begin{figure}[h]
     \centering
@@ -82,4 +82,4 @@ Auf der Registerkarte Port im rechten Teil des Fensters können die Daten über 
 \end{figure}
 
 \subsubsection{CSV Export}
-Durch einen Klick auf den Button \textbf{Export} können sämtliche Messungen, welche im angegebenen Zeitraum für den ausgewählten Switch gemacht wurden, in ein CSV-file exportiert werden. Durch betätigen des \textbf{Export} Buttons, wird ein Datei-Dialog angezeigt, in welchen man Ort und Name der resultierenden CSV Datei angeben muss.
+Durch einen Klick auf den Button \textbf{Export} können sämtliche Messungen, welche im angegebenen Zeitraum für den ausgewählten Switch gemacht wurden, in eine CSV-Datei exportiert werden. Durch betätigen des \textbf{Export} Buttons, wird ein Datei-Dialog angezeigt, in welchen man Ort und Name der resultierenden CSV-Datei angeben muss.
