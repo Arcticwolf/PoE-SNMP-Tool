@@ -24,6 +24,7 @@ public class Switch implements Serializable {
     private String type;
     private int portCount;
     private String comment;
+    private String community;
     @OneToMany(mappedBy="sw", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Port> ports;
     
@@ -32,12 +33,13 @@ public class Switch implements Serializable {
     }
     
     public Switch(String identifier, String ipAddress, String type, int portCount,
-            String comment) {
+            String comment, String community) {
         this.identifier = identifier;
         this.ipAddress = ipAddress;
         this.type = type;
         this.portCount = portCount;
         this.comment = comment;
+        this.community = community;
     }
 
     public String getIdentifier() {
@@ -95,11 +97,20 @@ public class Switch implements Serializable {
         this.comment = comment;
     }
     
+    public String getCommunity() {
+        return this.community;
+    }
+    
+    public void setCommunity(String community) {
+        this.community = community;
+    }
+    
     @Override
     public String toString() {
         return Objects.toStringHelper(Switch.class).add("identifier", identifier)
                 .add("ipAddress", ipAddress).add("type", type)
                 .add("portCount", portCount).add("comment", comment)
+                .add("community", community)
                 .omitNullValues().toString();
     }
 }

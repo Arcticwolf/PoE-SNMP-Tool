@@ -33,13 +33,13 @@ public class DataRetriever implements SNMPDataRetriever {
         try {
             Measurement measurement = new Measurement();
             measurement.setPort(port);
-            measurement.setCpeExtPsePortDeviceDetected(getBoolValue(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.3.1."+port.getPortNumber())));
-            measurement.setCpeExtPsePortEnable(getPortStatus(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.1.1."+port.getPortNumber())));
-            measurement.setCpeExtPsePortMaxPwrDrawn(Integer.parseInt(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.10.1."+port.getPortNumber())));
-            measurement.setCpeExtPsePortPwrAllocated(Integer.parseInt(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.7.1."+port.getPortNumber())));
-            measurement.setCpeExtPsePortPwrAvailable(Integer.parseInt(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.8.1."+port.getPortNumber())));
-            measurement.setCpeExtPsePortPwrMax(Integer.parseInt(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.6.1."+port.getPortNumber())));
-            measurement.setCpeExtPsePortPwrConsumption(Integer.parseInt(SNMPGet(port.getSw().getIpAddress(), "public", "1.3.6.1.4.1.9.9.402.1.2.1.9.1."+port.getPortNumber())));
+            measurement.setCpeExtPsePortDeviceDetected(getBoolValue(SNMPGet(port.getSw().getIpAddress(), port.getSw().getCommunity(), "1.3.6.1.4.1.9.9.402.1.2.1.3.1."+port.getPortNumber())));
+            measurement.setCpeExtPsePortEnable(getPortStatus(SNMPGet(port.getSw().getIpAddress(), port.getSw().getCommunity(), "1.3.6.1.4.1.9.9.402.1.2.1.1.1."+port.getPortNumber())));
+            measurement.setCpeExtPsePortMaxPwrDrawn(Integer.parseInt(SNMPGet(port.getSw().getIpAddress(), port.getSw().getCommunity(), "1.3.6.1.4.1.9.9.402.1.2.1.10.1."+port.getPortNumber())));
+            measurement.setCpeExtPsePortPwrAllocated(Integer.parseInt(SNMPGet(port.getSw().getIpAddress(), port.getSw().getCommunity(), "1.3.6.1.4.1.9.9.402.1.2.1.7.1."+port.getPortNumber())));
+            measurement.setCpeExtPsePortPwrAvailable(Integer.parseInt(SNMPGet(port.getSw().getIpAddress(), port.getSw().getCommunity(), "1.3.6.1.4.1.9.9.402.1.2.1.8.1."+port.getPortNumber())));
+            measurement.setCpeExtPsePortPwrMax(Integer.parseInt(SNMPGet(port.getSw().getIpAddress(), port.getSw().getCommunity(), "1.3.6.1.4.1.9.9.402.1.2.1.6.1."+port.getPortNumber())));
+            measurement.setCpeExtPsePortPwrConsumption(Integer.parseInt(SNMPGet(port.getSw().getIpAddress(), port.getSw().getCommunity(), "1.3.6.1.4.1.9.9.402.1.2.1.9.1."+port.getPortNumber())));
             measurement.setMeasureTime(new Date());
             return measurement;
         } catch (Exception e) {
