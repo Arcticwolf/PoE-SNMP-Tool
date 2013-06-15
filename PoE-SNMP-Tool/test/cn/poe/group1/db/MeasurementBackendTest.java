@@ -31,8 +31,8 @@ public class MeasurementBackendTest {
     @Test
     public void testPersistSwitch_shouldInsertSwitchs() throws Exception {
         int size_before = backend.retrieveAllSwitches().size();
-        backend.persistSwitch(new Switch("test1/id", "testIp", "testtype", 20, ""));
-        backend.persistSwitch(new Switch("test1/id2", "testIp2", "testtype2", 30, ""));
+        backend.persistSwitch(new Switch("test1/id", "testIp", "testtype", 20, "", "public"));
+        backend.persistSwitch(new Switch("test1/id2", "testIp2", "testtype2", 30, "", "public"));
         
         int size_after = backend.retrieveAllSwitches().size();
         assertThat(size_after, is(size_before + 2));
@@ -40,7 +40,7 @@ public class MeasurementBackendTest {
     
     @Test
     public void testUpdateSwitch_shouldUpdateSwitch() throws Exception {
-        Switch sw = new Switch("test2/id", "testIp", "testtype", 20, "");
+        Switch sw = new Switch("test2/id", "testIp", "testtype", 20, "", "public");
         backend.persistSwitch(sw);
         sw = backend.getSwitchById("test2/id");
         assertThat(sw, notNullValue());
@@ -57,7 +57,7 @@ public class MeasurementBackendTest {
     
     @Test
     public void testPersistPort_shouldInsertPorts() throws Exception {
-        Switch sw = new Switch("test3/id", "testIp", "testtype", 4, "");
+        Switch sw = new Switch("test3/id", "testIp", "testtype", 4, "", "public");
         backend.persistSwitch(sw);
         int size_before = backend.retrieveAllPorts(sw).size();
         backend.persistPort(new Port(sw, 1, ""));
@@ -68,7 +68,7 @@ public class MeasurementBackendTest {
     
     @Test
     public void testUpdatePort_shouldUpdatePort() throws Exception {
-        Switch sw = new Switch("test4/id", "testIp", "testtype", 4, "");
+        Switch sw = new Switch("test4/id", "testIp", "testtype", 4, "", "public");
         backend.persistSwitch(sw);
         Port port = new Port(sw, 1, "testComment");
         backend.persistPort(port);
@@ -83,7 +83,7 @@ public class MeasurementBackendTest {
     
     @Test
     public void testLoadMeasurementsWithIncorrectSwitchId_shouldReturnNoResult() throws Exception {
-        Switch sw = new Switch("test5/id", "testIp", "testtype", 20, "");
+        Switch sw = new Switch("test5/id", "testIp", "testtype", 20, "", "public");
         backend.persistSwitch(sw);
         Port port1 = new Port(sw, 1, "");
         Port port2 = new Port(sw, 2, "");
@@ -94,7 +94,7 @@ public class MeasurementBackendTest {
         Calendar end = getEndTime();
         
         insertTestMeasurements(port1, port2);
-        sw = new Switch("nonsenseid", "testIp", "testtype", 20, "");
+        sw = new Switch("nonsenseid", "testIp", "testtype", 20, "", "public");
         List<Measurement> results = backend.queryMeasurementsBySwitch(sw,  
                 begin.getTime(), end.getTime());
         
@@ -103,7 +103,7 @@ public class MeasurementBackendTest {
     
     @Test
     public void testLoadMeasurementsWithIncorrectTimes_shouldReturnNoResult() throws Exception {
-        Switch sw = new Switch("test6/id", "testIp", "testtype", 20, "");
+        Switch sw = new Switch("test6/id", "testIp", "testtype", 20, "", "public");
         backend.persistSwitch(sw);
         Port port1 = new Port(sw, 1, "");
         Port port2 = new Port(sw, 2, "");
@@ -123,7 +123,7 @@ public class MeasurementBackendTest {
     
     @Test
     public void testLoadMeasurementsByPort_shouldLoadResult() throws Exception {
-        Switch sw = new Switch("test7/id", "testIp", "testtype", 20, "");
+        Switch sw = new Switch("test7/id", "testIp", "testtype", 20, "", "public");
         backend.persistSwitch(sw);
         Port port1 = new Port(sw, 1, "");
         Port port2 = new Port(sw, 2, "");
@@ -152,7 +152,7 @@ public class MeasurementBackendTest {
     
     @Test
     public void testLoadMeasurementsBySwitch_shouldLoadResult() throws Exception {
-        Switch sw = new Switch("test8/id", "testIp", "testtype", 20, "");
+        Switch sw = new Switch("test8/id", "testIp", "testtype", 20, "", "public");
         backend.persistSwitch(sw);
         Port port1 = new Port(sw, 1, "");
         Port port2 = new Port(sw, 2, "");
@@ -177,7 +177,7 @@ public class MeasurementBackendTest {
     
     @Test
     public void testMeasurementSavingAndRetrievingWorks_shouldWork() throws Exception {
-        Switch sw = new Switch("test9/id", "testIp", "testtype", 20, "");
+        Switch sw = new Switch("test9/id", "testIp", "testtype", 20, "", "public");
         backend.persistSwitch(sw);
         Port port = new Port(sw, 1, "");
         backend.persistPort(port);
@@ -205,7 +205,7 @@ public class MeasurementBackendTest {
     
     @Test
     public void testPersistSwitchAndPorts_shouldWork() throws Exception {
-        Switch sw = new Switch("test10/id", "testIp", "testtype", 20, "");
+        Switch sw = new Switch("test10/id", "testIp", "testtype", 20, "", "public");
         Port port1 = new Port(sw, 1, "testComment");
         Port port2 = new Port(sw, 2, "testComment");
         sw.addPort(port1);
