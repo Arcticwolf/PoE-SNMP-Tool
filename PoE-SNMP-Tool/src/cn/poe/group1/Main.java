@@ -41,7 +41,7 @@ public class Main {
         log.info("distribution slots : {}", config.getDistributionSlots());
         log.info("data retriever implementation : {}", config.getDataRetrieverImpl());
         
-        addTestSwitches();
+        //addTestSwitches();
         
         // Load all switches from DB 
         List<Switch> switches = measurementBackend.retrieveAllSwitches();
@@ -52,16 +52,12 @@ public class Main {
     }
     
     private void addTestSwitches() {
-        // Just for testing impact of one MeasurementDatabase per thread
-        //for (int i=0; i<5; i++) {
-            //Switch sw = new Switch("testid_"+String.valueOf(i), "testIp", "testtype", 24, "testswitch");
             Switch sw = new Switch("testid", "128.131.30.85", "testtype", 48, "testswitch", "public");
             for (int j=1; j<=sw.getPortCount(); j++) {
                 Port p = new Port(sw, j, null);
                 sw.addPort(p);
             }
             measurementBackend.persistSwitch(sw);
-        //}
     }
     
     public MeasurementBackend getBackend() {
